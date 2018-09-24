@@ -1,0 +1,38 @@
+{{ define "layout" }}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        @import "http://fonts.fontstorage.com/import/ubuntumono.css";
+        body { 
+            font-family: 'Ubuntu Mono', monospace;
+        }
+        h1, h2 {
+            font-weight: 400;
+        }
+    </style>
+    <title>das.frama's домашняя</title>
+</head>
+<body>
+    <p align="center">
+        <a href="/">Я</a>
+        |
+        <a href="/done">Сделал</a>
+        |
+        <a href="/blog">Блог</a>
+    </p>
+    <br>
+    {{ template "content" }}
+    <br>
+    <p align="center">
+        <a href="https://t.me/das_frama" target="_blank">telegram</a>
+        |
+        <a href="mailto:das.frama@gmail.com">das.frama@gmail.com</a>
+        |
+        <a href="https://github.com/das-frama" target="_blank">github</a>
+    </p>
+</body>
+</html>
+{{ end }}
