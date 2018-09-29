@@ -1,0 +1,23 @@
+@import "http://fonts.fontstorage.com/import/ubuntumono.css";
+
+body {
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+h1, h2 {
+    font-weight: 400;
+    text-align: center;
+}
+
+nav { text-align: center; }
+
+p { text-align: center; }
+
+main {
+    margin: 0 auto;
+    max-width: 860px;
+}
+
+article p {
+    text-align: left;
+}

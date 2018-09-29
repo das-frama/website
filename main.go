@@ -2,21 +2,35 @@ package main
 
 import (
 	"html/template"
+	"log"
 	"net/http"
+
+	"github.com/das-frama/website/app"
+	"github.com/das-frama/website/model"
 )
 
 func main() {
+	// Load config
+	config := app.LoadConfig("app.conf")
+	// Connect to db.
+	session, err := app.OpenSession(config)
+	defer session.Close()
+	if err != nil {
+		log.Fatalln("Unable to connect to db: ", err)
+	}
+
+	// Create server.
 	mux := http.NewServeMux()
 	files := http.FileServer(http.Dir("public"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/blog", blog)
-
 	server := &http.Server{
-		Addr:    "127.0.0.1:8080",
+		Addr:    config.ServerAddress,
 		Handler: mux,
 	}
-	server.ListenAndServe()
+	log.Printf("Server is running and working on http://%s\n", server.Addr)
+	log.Fatalln(server.ListenAndServe())
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -29,10 +43,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func blog(w http.ResponseWriter, r *http.Request) {
+	posts := model.GetAllPosts()
+
 	files := []string{
 		"templates/layout.html",
 		"templates/blog.html",
 	}
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(w, "layout", "")
+	templates.ExecuteTemplate(w, "layout", posts)
 }
