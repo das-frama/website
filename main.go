@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path"
 
 	"github.com/das-frama/website/app"
 	"github.com/das-frama/website/model"
@@ -25,6 +26,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/blog", blog)
+	mux.HandleFunc("/blog/", blogRead)
 	server := &http.Server{
 		Addr:    config.ServerAddress,
 		Handler: mux,
@@ -51,4 +53,17 @@ func blog(w http.ResponseWriter, r *http.Request) {
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", posts)
+}
+
+func blogRead(w http.ResponseWriter, r *http.Request) {
+	p := r.URL.Path
+	slug := path.Base(p)
+	post := model.GetPostBySlug(slug)
+
+	files := []string{
+		"templates/layout.html",
+		"templates/blog.detail.html",
+	}
+	templates := template.Must(template.ParseFiles(files...))
+	templates.ExecuteTemplate(w, "layout", post)
 }

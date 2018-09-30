@@ -18,6 +18,8 @@ main {
     max-width: 860px;
 }
 
-article p {
-    text-align: left;
-}
+article time { background-color: lightgray; }
+
+article p { text-align: left; }
+
+article div { margin: 1rem 0 }

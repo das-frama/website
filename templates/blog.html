@@ -3,11 +3,13 @@
 <h1>Блог</h1>
 <p>здесь я оставляю свои размышления</p>
 
+<br>
 {{ range . }}
 <article>
-    <h3><a href="/blog/1">{{ .Title }}</a></h3>
-    <time datetime="2018-04-16">{{ .CreatedAt }}</time>
+    <h3>{{ .Title }}</h3>
+    <time datetime="{{ .CreatedAtFormatted }}">{{ .CreatedAtFormatted }}</time>
     <p>{{ .Text }}</p>
+    <p><a href="/blog/{{ .Slug }}">читать подробней</a></p>
 </article>
 <hr>
 {{ end }}
