@@ -32,7 +32,7 @@ func (p *Post) Create() {
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()
 	p.Status = statusEnabled
-	err := r.Table("post").Insert(p).Exec(app.Session)
+	err := r.Table("post").Insert(p).Exec(app.RethinkSession)
 	if err != nil {
 		log.Println(err)
 	}
@@ -41,7 +41,7 @@ func (p *Post) Create() {
 func GetAllPosts() []Post {
 	var posts []Post
 
-	cursor, _ := r.Table("post").Filter(r.Row.Field("status").Eq(statusEnabled)).OrderBy(r.Desc("created_at")).Run(app.Session)
+	cursor, _ := r.Table("post").Filter(r.Row.Field("status").Eq(statusEnabled)).OrderBy(r.Desc("created_at")).Run(app.RethinkSession)
 	cursor.All(&posts)
 
 	return posts
@@ -50,7 +50,7 @@ func GetAllPosts() []Post {
 func GetPostBySlug(slug string) Post {
 	var post Post
 
-	cursor, _ := r.Table("post").GetAllByIndex("slug", slug).Run(app.Session)
+	cursor, _ := r.Table("post").GetAllByIndex("slug", slug).Run(app.RethinkSession)
 	cursor.One(&post)
 
 	return post

@@ -7,18 +7,35 @@ import (
 	"path"
 
 	"github.com/das-frama/website/app"
+	"github.com/das-frama/website/app/session"
+	_ "github.com/das-frama/website/app/session/db"
 	"github.com/das-frama/website/model"
 )
 
-func main() {
-	// Load config
-	config := app.LoadConfig("app.conf")
+var (
+	config         *app.Config
+	globalSessions *session.Manager
+)
+
+func init() {
+	// Load config.
+	config = app.LoadConfig("app.conf")
+	var err error
 	// Connect to db.
-	session, err := app.OpenSession(config)
-	defer session.Close()
+	_, err = app.OpenSession(config)
 	if err != nil {
 		log.Fatalln("Unable to connect to db: ", err)
 	}
+	// Init global session manager.
+	globalSessions, err = session.NewManager("db", "gosessionid", 3600) // for an hour
+	if err != nil {
+		log.Fatalln("Unable create session: ", err)
+	}
+	go globalSessions.GC()
+}
+
+func main() {
+	defer app.RethinkSession.Close()
 
 	// Create server.
 	mux := http.NewServeMux()
@@ -27,6 +44,7 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/blog", blog)
 	mux.HandleFunc("/blog/", blogRead)
+	mux.HandleFunc("/login", login)
 	server := &http.Server{
 		Addr:    config.ServerAddress,
 		Handler: mux,
@@ -66,4 +84,20 @@ func blogRead(w http.ResponseWriter, r *http.Request) {
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", post)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	sess := globalSessions.SessionStart(w, r)
+	r.ParseForm()
+	if r.Method == "GET" {
+		files := []string{
+			"templates/layout.html",
+			"templates/login.html",
+		}
+		templates := template.Must(template.ParseFiles(files...))
+		templates.ExecuteTemplate(w, "layout", nil)
+	} else {
+		sess.Set("username", r.Form["username"])
+		http.Redirect(w, r, "/", 302)
+	}
 }

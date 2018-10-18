@@ -6,13 +6,13 @@ import (
 	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
-var Session *r.Session
+var RethinkSession *r.Session
 
 // OpenSession открывает и возвращает указатель на объект сессии RethinkDB на базе полученного конфига.
 func OpenSession(config *Config) (*r.Session, error) {
 	log.Println("Database is connecting...")
 	var err error
-	Session, err = r.Connect(r.ConnectOpts{
+	RethinkSession, err = r.Connect(r.ConnectOpts{
 		Address:  config.DbAddress,
 		Database: config.DbName,
 	})
@@ -22,5 +22,5 @@ func OpenSession(config *Config) (*r.Session, error) {
 	}
 	log.Println("Database is connected.")
 
-	return Session, nil
+	return RethinkSession, nil
 }

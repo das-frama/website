@@ -22,4 +22,15 @@ article time { background-color: lightgray; }
 
 article p { text-align: left; }
 
-article div { margin: 1rem 0 }
+article div { margin: 1rem 0; }
+
+form label { 
+    display: inline-block;
+    vertical-align: middle;
+    width: 150px;
+    text-align: right;
+}
+
+form input {
+    padding: .25rem .5rem;
+}
