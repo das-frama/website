@@ -1,1 +1,1 @@
-# website
+# Simple yet beautiful Golang website

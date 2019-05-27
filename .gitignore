@@ -13,3 +13,6 @@
 
 # VSCode internal files.
 .vscode
+
+# Executable.
+/server

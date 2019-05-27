@@ -1,4 +1,4 @@
-@import "http://fonts.fontstorage.com/import/ubuntumono.css";
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&display=swap&subset=cyrillic');
 
 body {
     font-family: 'Ubuntu Mono', monospace;
