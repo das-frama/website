@@ -16,3 +16,6 @@
 
 # Executable.
 /server
+
+# Go module sum file.
+go.sum
