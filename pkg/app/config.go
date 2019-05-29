@@ -14,6 +14,8 @@ type Config struct {
 	DBName     string
 	DBUser     string
 	DBPassword string
+
+	MDRoot string
 }
 
 // NewConfig returns a config struct and fills it with default values if path is not provide.
@@ -24,6 +26,8 @@ func NewConfig(path string) (*Config, error) {
 			DBName:     "website",
 			DBUser:     "root",
 			DBPassword: "",
+
+			MDRoot: "data",
 		}, nil
 	}
 

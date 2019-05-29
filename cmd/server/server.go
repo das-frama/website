@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/das-frama/website/pkg/app"
-	"github.com/das-frama/website/pkg/mongodb"
 	"github.com/das-frama/website/pkg/post"
 	"github.com/das-frama/website/pkg/router"
+	"github.com/das-frama/website/pkg/storage/markdown"
 )
 
 var (
@@ -26,14 +26,14 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	// MongoDB.
-	db, err := mongodb.NewDB(config)
-	if err != nil {
+	// File storage.
+	storage := markdown.NewStorage(config.MDRoot)
+	if err := storage.ScanFiles(); err != nil {
 		log.Fatalln(err)
 	}
 
 	// Services.
-	postService := post.NewService(mongodb.NewPostRepo(db))
+	postService := post.NewService(markdown.NewPostRepo(storage))
 	// Handlers.
 	postHandler := post.NewHandler(postService)
 

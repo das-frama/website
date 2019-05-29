@@ -1,32 +1,35 @@
 {{ define "layout" }}
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="/static/css/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="/static/css/style.css" />
     <title>das.frama's домашняя</title>
-</head>
-<body>
-    <nav>
-        <a href="/">Я</a>
+  </head>
+  <body>
+    <header>
+      <a id="name" href="/"><strong>Андрей Галактионов</strong></a>
+      <nav>
+        <a href="/done">Сделано</a>
         |
-        <a href="/done">Сделал</a>
+        <a href="/poetry">Стихи</a>
         |
         <a href="/blog">Блог</a>
-    </nav>
-    <br>
+      </nav>
+    </header>
     <main>
-        {{ template "content" . }}
+      {{ template "content" . }}
     </main>
-    <br>
-    <nav>
+    <footer>
+      <nav>
         <a href="https://t.me/das_frama" target="_blank">telegram</a>
         |
         <a href="mailto:das.frama@gmail.com">das.frama@gmail.com</a>
         |
         <a href="https://github.com/das-frama" target="_blank">github</a>
-    </nav>
-</body>
+      </nav>
+    </footer>
+  </body>
 </html>
 {{ end }}

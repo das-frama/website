@@ -8,7 +8,7 @@ import (
 
 // Post defines the properties of a post from a repo.
 type Post struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	Slug      string             `json:"slug" bson:"slug"`
 	Title     string             `json:"title" bson:"title"`
 	Text      string             `json:"text" bson:"text"`
@@ -19,5 +19,5 @@ type Post struct {
 
 // CreatedAtFormatted formats created_at timestamp in a human readable way.
 func (p *Post) CreatedAtFormatted() string {
-	return p.CreatedAt.Format("15:04 02.01.2006")
+	return p.CreatedAt.Format("02.01.2006")
 }
