@@ -4,7 +4,7 @@ import "time"
 
 // Service provides post actions.
 type Service interface {
-	FindBySlug(slug string) (*Post, error)
+	FindByPath(path string) (*Post, error)
 	FindAll() ([]*Post, error)
 	Create(post *Post) error
 	Update(post *Post) error
@@ -21,8 +21,8 @@ func NewService(repo Repository) Service {
 }
 
 // FindBySlug returns a post with provided slug.
-func (s *service) FindBySlug(slug string) (*Post, error) {
-	return s.repo.FindBySlug(slug)
+func (s *service) FindByPath(slug string) (*Post, error) {
+	return s.repo.FindByPath(slug)
 }
 
 // FindAll returns all stored posts.

@@ -1,7 +1,10 @@
-@import url("https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&display=swap&subset=cyrillic");
+@import url("https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&subset=cyrillic");
 
 body {
-  background-color: #f8f8f8;
+  background-color: #f9fcff;
+  /* background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); */
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+  /* background-size: 256px 256px; */
   font-family: "Ubuntu Mono", monospace;
   max-width: 860px;
   margin: 0 auto;
@@ -55,7 +58,8 @@ header nav {
 }
 
 footer {
-  margin: 2rem 0;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
 }
 
 blockquote {

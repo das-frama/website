@@ -3,13 +3,14 @@ package post
 import (
 	"net/http"
 	"path"
+	"strings"
 	"text/template"
 )
 
 // Handler provides http handlers for post model.
 type Handler interface {
 	Get(w http.ResponseWriter, r *http.Request)
-	GetBySlug(w http.ResponseWriter, r *http.Request)
+	GetByPath(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
@@ -21,10 +22,11 @@ func NewHandler(postService Service) Handler {
 	return &handler{postService}
 }
 
-func (h *handler) GetBySlug(w http.ResponseWriter, r *http.Request) {
-	p := r.URL.Path
-	slug := path.Base(p)
-	post, err := h.postService.FindBySlug(slug)
+func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
+	dir, file := path.Split(r.URL.Path)
+	dir = strings.TrimPrefix(dir, "/blog/")
+	slug := path.Join(dir, file)
+	post, err := h.postService.FindByPath(slug)
 	if err != nil {
 		h.ErrorHandler(w, r, http.StatusNotFound)
 		return

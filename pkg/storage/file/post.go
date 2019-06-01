@@ -1,4 +1,4 @@
-package markdown
+package file
 
 import (
 	"github.com/das-frama/website/pkg/post"
@@ -13,36 +13,36 @@ func NewPostRepo(s *Storage) post.Repository {
 	return &postRepo{s}
 }
 
-// FindBySlug returns a post with provided slug.
-func (r *postRepo) FindBySlug(slug string) (*post.Post, error) {
-	md, err := r.storage.FindFile(slug)
+// FindBySlug returns a post with provided path.
+func (r *postRepo) FindByPath(path string) (*post.Post, error) {
+	md, err := r.storage.FindFile("blog", path)
 	if err != nil {
 		return nil, err
 	}
 
 	return &post.Post{
-		Slug:      md.Name(),
-		Title:     md.Title(),
-		Text:      md.Content(),
-		CreatedAt: md.Date(),
+		Slug:      md.Name,
+		Title:     md.Title,
+		CreatedAt: md.Date,
+		Text:      md.GetContent(),
 		IsActive:  true,
 	}, nil
 }
 
 // FindAll returns all stored posts.
 func (r *postRepo) FindAll() ([]*post.Post, error) {
-	mds, err := r.storage.FindFiles()
+	files, err := r.storage.FindAllFiles("blog")
 	if err != nil {
 		return nil, err
 	}
 
-	posts := make([]*post.Post, 0, len(mds))
-	for _, md := range mds {
+	posts := make([]*post.Post, 0, len(files))
+	for _, file := range files {
 		posts = append(posts, &post.Post{
-			Slug:      md.Name(),
-			Title:     md.Title(),
-			Text:      md.Content(),
-			CreatedAt: md.Date(),
+			Slug:      file.Name,
+			Title:     file.Title,
+			CreatedAt: file.Date,
+			Text:      file.GetContent(),
 			IsActive:  true,
 		})
 	}
