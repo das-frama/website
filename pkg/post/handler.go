@@ -23,6 +23,7 @@ func NewHandler(postService Service) Handler {
 }
 
 func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
+	// t := time.Now()
 	dir, file := path.Split(r.URL.Path)
 	dir = strings.TrimPrefix(dir, "/blog/")
 	slug := path.Join(dir, file)
@@ -38,6 +39,7 @@ func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", post)
+	// log.Println(time.Since(t))
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {

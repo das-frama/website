@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/russross/blackfriday"
 )
 
 // File represents a markdown file.
@@ -16,7 +18,8 @@ type File struct {
 	Date  time.Time
 	Title string
 
-	root string
+	root       string
+	isRendered bool
 }
 
 // NewFile creates a new File struct .
@@ -71,12 +74,38 @@ func (f *File) GetTitle() string {
 	return ""
 }
 
-// GetContent returns a file's content.
-func (f *File) GetContent() string {
-	b, err := ioutil.ReadFile(f.Path)
+// HTML returns a file's content.
+func (f *File) HTML(runtime string) ([]byte, error) {
+	path := filepath.Join(runtime, f.Path)
+	path = strings.Replace(path, ".md", ".html", 1)
+	// if _, err := os.Stat(path); err == nil {
+	// 	f.isRendered = true
+	// 	return ioutil.ReadFile(path)
+	// }
+
+	return f.SaveMarkdown(path)
+	// f.isRendered = true
+	// return html, err
+}
+
+// SaveMarkdown returns
+func (f *File) SaveMarkdown(path string) ([]byte, error) {
+	// Read original .md file.
+	input, err := ioutil.ReadFile(f.Path)
 	if err != nil {
-		return ""
+		return []byte{}, err
 	}
 
-	return string(b)
+	// Create dir if not exist.
+	dir := filepath.Dir(path)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		os.MkdirAll(dir, 0644)
+	}
+
+	// Render markdown.
+	output := blackfriday.Run(input)
+
+	// Save file.
+	err = ioutil.WriteFile(path, output, 0644)
+	return output, err
 }

@@ -1,6 +1,8 @@
 package file
 
 import (
+	"html/template"
+
 	"github.com/das-frama/website/pkg/post"
 )
 
@@ -15,16 +17,21 @@ func NewPostRepo(s *Storage) post.Repository {
 
 // FindBySlug returns a post with provided path.
 func (r *postRepo) FindByPath(path string) (*post.Post, error) {
-	md, err := r.storage.FindFile("blog", path)
+	file, err := r.storage.FindFile("blog", path)
+	if err != nil {
+		return nil, err
+	}
+
+	html, err := file.HTML(r.storage.Runtime)
 	if err != nil {
 		return nil, err
 	}
 
 	return &post.Post{
-		Slug:      md.Name,
-		Title:     md.Title,
-		CreatedAt: md.Date,
-		Text:      md.GetContent(),
+		Slug:      file.Name,
+		Title:     file.Title,
+		CreatedAt: file.Date,
+		Text:      template.HTML(html),
 		IsActive:  true,
 	}, nil
 }
@@ -42,7 +49,6 @@ func (r *postRepo) FindAll() ([]*post.Post, error) {
 			Slug:      file.Name,
 			Title:     file.Title,
 			CreatedAt: file.Date,
-			Text:      file.GetContent(),
 			IsActive:  true,
 		})
 	}

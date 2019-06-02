@@ -1,17 +1,18 @@
 package post
 
 import (
+	"html/template"
 	"time"
 )
 
 // Post defines the properties of a post from a repo.
 type Post struct {
-	Slug      string    `json:"slug" bson:"slug"`
-	Title     string    `json:"title" bson:"title"`
-	Text      string    `json:"text" bson:"text"`
-	IsActive  bool      `json:"status" bson:"status"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	Slug      string
+	Title     string
+	Text      template.HTML
+	IsActive  bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // CreatedAtFormatted formats created_at timestamp in a human readable way.

@@ -1,11 +1,8 @@
 {{ define "content" }}
 
-<h1>{{ .Title }}</h1>
-<br />
 <article>
-  <time datetime="{{ .CreatedAtFormatted }}">{{ .CreatedAt.Format "02.01.2006" }}</time>
-  <div>{{ .Text | html }}</div>
+  {{ .Text }}
+  <time datetime="{{ .CreatedAtFormatted }}">Опубликовано: {{ .CreatedAt.Format "02.01.2006" }}</time>
 </article>
 
-<a href="/blog">&lt;&lt; назад</a>
 {{ end }}

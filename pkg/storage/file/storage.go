@@ -8,14 +8,16 @@ import (
 
 // Storage represents a manager for markdown files.
 type Storage struct {
-	Root string
+	Root    string
+	Runtime string
 }
 
 // NewStorage creates a struct for file-based markdown storage
 // where all files grouped by catalogs with names like Y-m-d date (e.g. 2019-05-28).
-func NewStorage(root string) *Storage {
+func NewStorage(root, runtime string) *Storage {
 	return &Storage{
-		Root: root,
+		Root:    root,
+		Runtime: runtime,
 	}
 }
 

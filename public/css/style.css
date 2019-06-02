@@ -81,11 +81,19 @@ main {
 }
 
 article time {
-  background-color: lightgray;
+  display: block;
+  margin-top: 1.5rem;
+  /* text-align: right; */
+}
+
+article h1 {
+  font-size: 2rem;
+  margin-top: 0.5rem;
 }
 
 article p {
   text-align: left;
+  margin: 1rem 0;
 }
 
 article div {

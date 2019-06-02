@@ -9,6 +9,7 @@
   <time datetime="{{ .CreatedAtFormatted }}">
     {{ .CreatedAt.Format "02.01.2006" }}
   </time>
+  &mdash;
   <a href="/blog/{{ .Slug }}">{{ .Title }}</a>
 </p>
 {{ end }}
