@@ -22,7 +22,7 @@ func (r *postRepo) FindByPath(path string) (*post.Post, error) {
 		return nil, err
 	}
 
-	html, err := file.HTML(r.storage.Runtime)
+	html, err := file.HTML()
 	if err != nil {
 		return nil, err
 	}

@@ -12,16 +12,15 @@ import (
 )
 
 var (
-	port    = flag.Int("port", 8000, "specify port number")
-	data    = flag.String("data", "data", "data's root path")
-	runtime = flag.String("runtime", "runtime", "runtime cache dir")
+	port = flag.Int("port", 8000, "specify port number")
+	data = flag.String("data", "data", "data's root path")
 )
 
 func main() {
 	flag.Parse()
 
 	// File storage.
-	storage := file.NewStorage(*data, *runtime)
+	storage := file.NewStorage(*data)
 	// Services.
 	postService := post.NewService(file.NewPostRepo(storage))
 	// Handlers.

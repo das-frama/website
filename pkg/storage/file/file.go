@@ -75,37 +75,14 @@ func (f *File) GetTitle() string {
 }
 
 // HTML returns a file's content.
-func (f *File) HTML(runtime string) ([]byte, error) {
-	path := filepath.Join(runtime, f.Path)
-	path = strings.Replace(path, ".md", ".html", 1)
-	// if _, err := os.Stat(path); err == nil {
-	// 	f.isRendered = true
-	// 	return ioutil.ReadFile(path)
-	// }
-
-	return f.SaveMarkdown(path)
-	// f.isRendered = true
-	// return html, err
-}
-
-// SaveMarkdown returns
-func (f *File) SaveMarkdown(path string) ([]byte, error) {
+func (f *File) HTML() ([]byte, error) {
 	// Read original .md file.
 	input, err := ioutil.ReadFile(f.Path)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	// Create dir if not exist.
-	dir := filepath.Dir(path)
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		os.MkdirAll(dir, 0644)
-	}
-
 	// Render markdown.
 	output := blackfriday.Run(input)
-
-	// Save file.
-	err = ioutil.WriteFile(path, output, 0644)
-	return output, err
+	return output, nil
 }

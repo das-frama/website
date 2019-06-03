@@ -8,24 +8,28 @@ import (
 
 // Storage represents a manager for markdown files.
 type Storage struct {
-	Root    string
-	Runtime string
+	Root string
 }
 
 // NewStorage creates a struct for file-based markdown storage
 // where all files grouped by catalogs with names like Y-m-d date (e.g. 2019-05-28).
-func NewStorage(root, runtime string) *Storage {
+func NewStorage(root string) *Storage {
 	return &Storage{
-		Root:    root,
-		Runtime: runtime,
+		Root: root,
 	}
 }
 
 // ScanDir scans the root folder for .md files.
 func (s *Storage) ScanDir(dir string) (map[string]*File, error) {
 	files := make(map[string]*File)
-	// Walk for every file in the root dir.
 	root := filepath.Join(s.Root, dir)
+	if _, err := os.Stat(root); os.IsNotExist(err) {
+		if err = os.MkdirAll(root, 0755); err != nil {
+			return files, err
+		}
+	}
+
+	// Walk for every file in the root dir.
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		// Skip unnecessary dirs and files.
 		if info.IsDir() || filepath.Ext(path) != ".md" {
