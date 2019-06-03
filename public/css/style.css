@@ -51,20 +51,23 @@ header {
 }
 
 header #name {
-  display: inline-block;
-  vertical-align: middle;
-  text-decoration: none;
-  font-size: 1.25rem;
   margin-right: 1rem;
+  font-size: 1.25rem;
+  text-decoration: none;
 }
 
 header #name:hover {
   text-decoration: underline;
 }
 
-header nav {
+header nav a {
+  line-height: 1.25;
   display: inline-block;
   vertical-align: middle;
+}
+
+header nav a.active {
+  font-weight: bold;
 }
 
 footer {

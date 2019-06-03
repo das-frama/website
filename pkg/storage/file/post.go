@@ -17,7 +17,7 @@ func NewPostRepo(s *Storage) post.Repository {
 
 // FindBySlug returns a post with provided path.
 func (r *postRepo) FindByPath(path string) (*post.Post, error) {
-	file, err := r.storage.FindFile("blog", path)
+	file, err := r.storage.FindFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,8 @@ func (r *postRepo) FindByPath(path string) (*post.Post, error) {
 }
 
 // FindAll returns all stored posts.
-func (r *postRepo) FindAll() ([]*post.Post, error) {
-	files, err := r.storage.FindAllFiles("blog")
+func (r *postRepo) FindAll(dir string) ([]*post.Post, error) {
+	files, err := r.storage.FindAllFiles(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -54,19 +54,4 @@ func (r *postRepo) FindAll() ([]*post.Post, error) {
 	}
 
 	return posts, nil
-}
-
-// Create creates a post in the storage.
-func (r *postRepo) Insert(post *post.Post) error {
-	return nil
-}
-
-// Update updates the post in storage.
-func (r *postRepo) Update(post *post.Post) error {
-	return nil
-}
-
-// Delete deletes the post with provided id from storage.
-func (r *postRepo) Delete(id string) (bool, error) {
-	return false, nil
 }

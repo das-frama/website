@@ -46,7 +46,7 @@ func (f *File) Update() {
 func (f *File) GetName() string {
 	name := strings.TrimPrefix(f.Path, f.root)
 	name = strings.TrimSuffix(name, ".md")
-	return filepath.ToSlash(name[1:])
+	return filepath.ToSlash(name)
 }
 
 // GetDate returns time.Time from creation time of the file.
@@ -62,12 +62,13 @@ func (f *File) GetTitle() string {
 	}
 	defer file.Close()
 
-	// Scan every string until # is not found.
+	// Scan every string until first not empty line is found.
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if strings.HasPrefix(line, "#") {
-			return strings.TrimSpace(line[1:])
+		line = strings.Trim(line, "#\\/")
+		if len(line) > 0 {
+			return line
 		}
 	}
 

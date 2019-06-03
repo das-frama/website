@@ -3,9 +3,14 @@ package post
 import (
 	"net/http"
 	"path"
-	"strings"
 	"text/template"
 )
+
+type viewData struct {
+	Title  string
+	Active string
+	Data   interface{}
+}
 
 // Handler provides http handlers for post model.
 type Handler interface {
@@ -23,11 +28,7 @@ func NewHandler(postService Service) Handler {
 }
 
 func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
-	// t := time.Now()
-	dir, file := path.Split(r.URL.Path)
-	dir = strings.TrimPrefix(dir, "/blog/")
-	slug := path.Join(dir, file)
-	post, err := h.postService.FindByPath(slug)
+	post, err := h.postService.FindByPath(r.URL.Path)
 	if err != nil {
 		h.ErrorHandler(w, r, http.StatusNotFound)
 		return
@@ -38,15 +39,22 @@ func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
 		"templates/blog.detail.html",
 	}
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(w, "layout", post)
-	// log.Println(time.Since(t))
+	templates.ExecuteTemplate(w, "layout", viewData{
+		Title: post.Title,
+		Data:  post,
+	})
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
-	posts, err := h.postService.FindAll()
+	dir := path.Base(r.URL.Path)
+	posts, err := h.postService.FindAll(dir)
 	if err != nil {
 		h.ErrorHandler(w, r, http.StatusNotFound)
 		return
+	}
+	title := "Блог"
+	if dir == "poetry" {
+		title = "Стихи"
 	}
 
 	files := []string{
@@ -54,7 +62,11 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		"templates/blog.html",
 	}
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(w, "layout", posts)
+	templates.ExecuteTemplate(w, "layout", viewData{
+		Title:  title,
+		Active: dir,
+		Data:   posts,
+	})
 }
 
 func (h *handler) ErrorHandler(w http.ResponseWriter, r *http.Request, status int) {

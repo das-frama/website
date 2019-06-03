@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+type viewData struct {
+	Title  string
+	Active string
+	Data   interface{}
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		errorHandler(w, r, http.StatusNotFound)
@@ -16,7 +22,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 		"templates/index.html",
 	}
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(w, "layout", "index")
+	templates.ExecuteTemplate(w, "layout", viewData{
+		Active: "index",
+	})
 }
 
 func errorHandler(w http.ResponseWriter, r *http.Request, status int) {

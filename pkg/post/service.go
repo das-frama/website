@@ -1,14 +1,9 @@
 package post
 
-import "time"
-
 // Service provides post actions.
 type Service interface {
 	FindByPath(path string) (*Post, error)
-	FindAll() ([]*Post, error)
-	Create(post *Post) error
-	Update(post *Post) error
-	Delete(id string) (bool, error)
+	FindAll(dir string) ([]*Post, error)
 }
 
 type service struct {
@@ -21,30 +16,11 @@ func NewService(repo Repository) Service {
 }
 
 // FindBySlug returns a post with provided slug.
-func (s *service) FindByPath(slug string) (*Post, error) {
-	return s.repo.FindByPath(slug)
+func (s *service) FindByPath(path string) (*Post, error) {
+	return s.repo.FindByPath(path)
 }
 
 // FindAll returns all stored posts.
-func (s *service) FindAll() ([]*Post, error) {
-	return s.repo.FindAll()
-}
-
-// Create creates a post in the repo.
-func (s *service) Create(post *Post) error {
-	post.CreatedAt = time.Now()
-	post.UpdatedAt = time.Now()
-	post.IsActive = true
-	return s.repo.Insert(post)
-}
-
-// Update updates the post in repo.
-func (s *service) Update(post *Post) error {
-	post.UpdatedAt = time.Now()
-	return s.repo.Update(post)
-}
-
-// Delete deletes the post with provided id from repo.
-func (s *service) Delete(id string) (bool, error) {
-	return s.repo.Delete(id)
+func (s *service) FindAll(dir string) ([]*Post, error) {
+	return s.repo.FindAll(dir)
 }

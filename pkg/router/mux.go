@@ -11,6 +11,8 @@ func NewRouter(postHandler post.Handler) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", index)
+	mux.HandleFunc("/poetry", postHandler.Get)
+	mux.HandleFunc("/poetry/", postHandler.GetByPath)
 	mux.HandleFunc("/blog", postHandler.Get)
 	mux.HandleFunc("/blog/", postHandler.GetByPath)
 	// Serve static files.

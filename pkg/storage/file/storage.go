@@ -36,7 +36,7 @@ func (s *Storage) ScanDir(dir string) (map[string]*File, error) {
 			return nil
 		}
 
-		file, _ := NewFile(path, root)
+		file, _ := NewFile(path, s.Root)
 		files[file.GetName()] = file
 
 		return nil
@@ -45,7 +45,8 @@ func (s *Storage) ScanDir(dir string) (map[string]*File, error) {
 }
 
 // FindFile finds the file with provided path.
-func (s *Storage) FindFile(dir, path string) (*File, error) {
+func (s *Storage) FindFile(path string) (*File, error) {
+	dir := filepath.Dir(path)
 	// Get all files.
 	files, err := s.ScanDir(dir)
 	if err != nil {

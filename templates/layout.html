@@ -4,16 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="keywords" content="golang, developer, frama, das-frama, das.frama, das_frama">
+  <meta name="description" content="Personal web page of regular human being">
+  <meta name="author" content="Andrey Galaktionov">
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <link rel="stylesheet" href="/static/css/style.css" />
-  <title>das.frama's домашняя</title>
+  <title>{{ if .Title }} {{ .Title }} / {{ end }}Andrey Galaktionov</title>
 </head>
 
 <body>
   <header>
-    <a id="name" href="/"><strong>Андрей Галактионов</strong></a>
     <nav>
-      <a href="/blog">Блог</a>
+      <a {{ if eq .Active "index" }} class="active" {{ end }} id="name" href="/">Андрей Галактионов</a>
+      <a {{ if eq .Active "poetry" }} class="active" {{ end }} href="/poetry">Стихи</a>
+      |
+      <a {{ if eq .Active "blog" }} class="active" {{ end }} href="/blog">Блог</a>
     </nav>
   </header>
   <main>
