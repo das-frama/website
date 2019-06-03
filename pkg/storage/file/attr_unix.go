@@ -11,5 +11,6 @@ import (
 func timeCreation(path string) time.Time {
 	info, _ := os.Lstat(path)
 	sys := info.Sys().(*syscall.Stat_t)
-	return time.Unix(0, sys.Ctimespec.Nsec)
+	sec, nano := sys.Ctim.Unix()
+	return time.Unix(sec, nano)
 }
