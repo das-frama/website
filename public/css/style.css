@@ -136,6 +136,7 @@ figcaption {
 
 .row {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 2rem;
   margin-bottom: 2rem;
 }
@@ -146,6 +147,14 @@ figcaption {
 
 .left {
   margin-right: 2rem;
+  margin-bottom: 2rem;
+}
+
+.right {
+  flex-grow: 1;
+  flex-basis: 0;
+  max-width: 100%;
+  min-width: 250px;
 }
 
 .muted {

@@ -19,3 +19,6 @@
 
 # Go module sum file.
 go.sum
+
+# Deploy.
+deploy.sh
