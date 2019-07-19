@@ -1,9 +1,0 @@
-{{ define "content" }}
-
-<article>
-  {{ $post := .Data }}
-  {{ $post.Text }}
-  <time datetime="{{ $post.CreatedAtFormatted }}">Опубликовано: {{ $post.CreatedAt.Format "02.01.2006" }}</time>
-</article>
-
-{{ end }}
