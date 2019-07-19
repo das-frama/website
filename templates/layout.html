@@ -1,5 +1,4 @@
-{{ define "layout" }}
-<!DOCTYPE html>
+{{ define "layout" }}<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -20,6 +19,8 @@
       <a {{ if eq .Active "poetry" }} class="active" {{ end }} href="/poetry">Стихи</a>
       |
       <a {{ if eq .Active "blog" }} class="active" {{ end }} href="/blog">Блог</a>
+      |
+      <a {{ if eq .Active "likes" }} class="active" {{ end }} href="/likes">Интересное</a>
     </nav>
   </header>
   <main>

@@ -1,0 +1,14 @@
+{{ define "content" }}
+
+<h1>{{ .Title }}</h1>
+
+{{ range .Data }}
+  {{ $exp := . }}
+  <section>
+    {{ $exp.Text }}
+
+    <time>Обновлено: {{ .CreatedAt.Format "02.01.2006" }}</time>
+  </section>
+{{ end }}
+
+{{ end }}

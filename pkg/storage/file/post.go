@@ -2,6 +2,7 @@ package file
 
 import (
 	"html/template"
+	"sort"
 
 	"github.com/das-frama/website/pkg/post"
 )
@@ -22,16 +23,17 @@ func (r *postRepo) FindByPath(path string) (*post.Post, error) {
 		return nil, err
 	}
 
-	html, err := file.HTML()
-	if err != nil {
+	// Fetch all data from the file.
+	if err := file.FetchAll(); err != nil {
 		return nil, err
 	}
 
 	return &post.Post{
 		Slug:      file.Name,
 		Title:     file.Title,
-		CreatedAt: file.Date,
-		Text:      template.HTML(html),
+		CreatedAt: file.CreatedAt,
+		UpdatedAt: file.UpdatedAt,
+		Text:      template.HTML(file.Content),
 		IsActive:  true,
 	}, nil
 }
@@ -43,15 +45,34 @@ func (r *postRepo) FindAll(dir string) ([]*post.Post, error) {
 		return nil, err
 	}
 
+	// Prepare posts from map for sorting.
 	posts := make([]*post.Post, 0, len(files))
 	for _, file := range files {
+		// Fetch data from the file.
+		if err := file.FetchName(); err != nil {
+			return posts, err
+		}
+		if err := file.FetchTitle(); err != nil {
+			return posts, err
+		}
+		if err := file.FetchTime(); err != nil {
+			return posts, err
+		}
 		posts = append(posts, &post.Post{
 			Slug:      file.Name,
 			Title:     file.Title,
-			CreatedAt: file.Date,
+			CreatedAt: file.CreatedAt,
+			UpdatedAt: file.UpdatedAt,
 			IsActive:  true,
 		})
 	}
+
+	// Sort posts from newest to oldest.
+	sort.Slice(posts, func(i, j int) bool {
+		d1 := posts[i].CreatedAt
+		d2 := posts[j].CreatedAt
+		return d1.After(d2)
+	})
 
 	return posts, nil
 }

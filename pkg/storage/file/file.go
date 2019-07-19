@@ -13,10 +13,12 @@ import (
 
 // File represents a markdown file.
 type File struct {
-	Path  string
-	Name  string
-	Date  time.Time
-	Title string
+	Path      string
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Title     string
+	Content   []byte
 
 	root       string
 	isRendered bool
@@ -29,36 +31,51 @@ func NewFile(path, root string) (*File, error) {
 		return nil, ErrWrongType
 	}
 
-	return &File{
+	file := &File{
 		Path: path,
 		root: root,
-	}, nil
+	}
+
+	return file, nil
 }
 
-// Update updates name, date and title from the actual file.
-func (f *File) Update() {
-	f.Name = f.GetName()
-	f.Date = f.GetDate()
-	f.Title = f.GetTitle()
+// FetchAll sets all according properties from the actual file.
+func (f *File) FetchAll() error {
+	if err := f.FetchName(); err != nil {
+		return err
+	}
+	if err := f.FetchTitle(); err != nil {
+		return err
+	}
+	if err := f.FetchTime(); err != nil {
+		return err
+	}
+	if err := f.FetchContent(); err != nil {
+		return err
+	}
+	return nil
 }
 
-// GetName gets a file's name by its path.
-func (f *File) GetName() string {
+// FetchName gets a file's name by its path.
+func (f *File) FetchName() error {
 	name := strings.TrimPrefix(f.Path, f.root)
 	name = strings.TrimSuffix(name, ".md")
-	return filepath.ToSlash(name)
+	f.Name = filepath.ToSlash(name)
+	return nil
 }
 
-// GetDate returns time.Time from creation time of the file.
-func (f *File) GetDate() time.Time {
-	return timeCreation(f.Path)
+// FetchTime returns time.Time from creation and modification time of the file.
+func (f *File) FetchTime() error {
+	var err error
+	f.CreatedAt, f.UpdatedAt, err = timeFromFile(f.Path)
+	return err
 }
 
-// GetTitle returns a # title from the file's content.
-func (f *File) GetTitle() string {
+// FetchTitle returns a # title from the file's content.
+func (f *File) FetchTitle() error {
 	file, err := os.Open(f.Path)
 	if err != nil {
-		return ""
+		return err
 	}
 	defer file.Close()
 
@@ -68,22 +85,22 @@ func (f *File) GetTitle() string {
 		line := strings.TrimSpace(scanner.Text())
 		line = strings.Trim(line, "#\\/")
 		if len(line) > 0 {
-			return line
+			f.Title = line
+			return nil
 		}
 	}
 
-	return ""
+	return nil
 }
 
-// HTML returns a file's content.
-func (f *File) HTML() ([]byte, error) {
+// FetchContent sets to Text a file's content.
+func (f *File) FetchContent() error {
 	// Read original .md file.
 	input, err := ioutil.ReadFile(f.Path)
 	if err != nil {
-		return []byte{}, err
+		return err
 	}
-
 	// Render markdown.
-	output := blackfriday.Run(input)
-	return output, nil
+	f.Content = blackfriday.Run(input)
+	return nil
 }

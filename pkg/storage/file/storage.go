@@ -3,7 +3,6 @@ package file
 import (
 	"os"
 	"path/filepath"
-	"sort"
 )
 
 // Storage represents a manager for markdown files.
@@ -37,7 +36,8 @@ func (s *Storage) ScanDir(dir string) (map[string]*File, error) {
 		}
 
 		file, _ := NewFile(path, s.Root)
-		files[file.GetName()] = file
+		file.FetchName()
+		files[file.Name] = file
 
 		return nil
 	})
@@ -58,32 +58,11 @@ func (s *Storage) FindFile(path string) (*File, error) {
 	if !ok {
 		return nil, ErrNotFound
 	}
-	file.Update()
 
 	return file, nil
 }
 
 // FindAllFiles returns all stored files.
-func (s *Storage) FindAllFiles(dir string) ([]*File, error) {
-	// Get all files.
-	files, err := s.ScanDir(dir)
-	if err != nil {
-		return nil, err
-	}
-
-	// Make slice from map.
-	slice := make([]*File, 0, len(files))
-	for _, file := range files {
-		file.Update()
-		slice = append(slice, file)
-	}
-
-	// Sort files from newest to oldest.
-	sort.Slice(slice, func(i, j int) bool {
-		d1 := slice[i].Date
-		d2 := slice[j].Date
-		return d1.After(d2)
-	})
-
-	return slice, nil
+func (s *Storage) FindAllFiles(dir string) (map[string]*File, error) {
+	return s.ScanDir(dir)
 }

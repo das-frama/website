@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/das-frama/website/pkg/like"
 	"github.com/das-frama/website/pkg/post"
 	"github.com/das-frama/website/pkg/router"
 	"github.com/das-frama/website/pkg/storage/file"
@@ -23,10 +24,12 @@ func main() {
 	storage := file.NewStorage(*data)
 	// Services.
 	postService := post.NewService(file.NewPostRepo(storage))
+	likeService := like.NewService(file.NewLikeRepo(storage))
 	// Handlers.
 	postHandler := post.NewHandler(postService)
+	likeHandler := like.NewHandler(likeService)
 	// Router.
-	mux := router.NewRouter(postHandler)
+	mux := router.NewRouter(postHandler, likeHandler)
 
 	// Server.
 	server := &http.Server{

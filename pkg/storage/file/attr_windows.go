@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func timeCreation(path string) time.Time {
+func timeFromFile(path string) (time.Time, time.Time) {
 	info, _ := os.Lstat(path)
 	sys := info.Sys().(*syscall.Win32FileAttributeData)
-	return time.Unix(0, sys.CreationTime.Nanoseconds())
+	return time.Unix(0, sys.CreationTime.Nanoseconds()), time.Unix(0, sys.LastWriteTime.Nanoseconds())
 }
