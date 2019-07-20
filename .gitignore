@@ -22,3 +22,5 @@ go.sum
 
 # Deploy.
 deploy.sh
+
+data/
