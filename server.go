@@ -10,7 +10,6 @@ import (
 	"github.com/das-frama/website/pkg/post"
 	"github.com/das-frama/website/pkg/router"
 	"github.com/das-frama/website/pkg/storage/file"
-	"github.com/das-frama/website/pkg/webhook"
 )
 
 var (
@@ -27,11 +26,10 @@ func main() {
 	// Services.
 	postService := post.NewService(file.NewPostRepo(storage))
 	likeService := like.NewService(file.NewLikeRepo(storage))
-	gitService := webhook.NewService(webhook.NewGithubRepo())
 	// Handlers.
 	postHandler := post.NewHandler(postService)
 	likeHandler := like.NewHandler(likeService)
-	webhookHandler := webhook.NewHandler(gitService)
+	// webhookHandler := webhook.NewHandler(gitService)
 	// Router.
 	mux := router.NewRouter(postHandler, likeHandler)
 
