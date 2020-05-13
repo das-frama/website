@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/russross/blackfriday"
+	"github.com/russross/blackfriday/v2"
 )
 
 // File represents a markdown file.
@@ -101,6 +101,6 @@ func (f *File) FetchContent() error {
 		return err
 	}
 	// Render markdown.
-	f.Content = blackfriday.Run(input)
+	f.Content = blackfriday.Run(input,  blackfriday.WithNoExtensions())
 	return nil
 }
