@@ -36,8 +36,9 @@ func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
 
 	files := []string{
 		"templates/layout.html",
-		"templates/blog.detail.html",
+		"templates/log.detail.html",
 	}
+
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", viewData{
 		Title: post.Title,
@@ -59,7 +60,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 
 	files := []string{
 		"templates/layout.html",
-		"templates/blog.html",
+		"templates/log.html",
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", viewData{

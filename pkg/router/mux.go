@@ -14,8 +14,8 @@ func NewRouter(postHandler post.Handler, likeHandler like.Handler) *http.ServeMu
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/poetry", postHandler.Get)
 	mux.HandleFunc("/poetry/", postHandler.GetByPath)
-	mux.HandleFunc("/blog", postHandler.Get)
-	mux.HandleFunc("/blog/", postHandler.GetByPath)
+	mux.HandleFunc("/log", postHandler.Get)
+	mux.HandleFunc("/log/", postHandler.GetByPath)
 	mux.HandleFunc("/likes", likeHandler.Get)
 	// Serve static files.
 	files := http.FileServer(http.Dir("public"))
