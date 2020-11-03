@@ -1,0 +1,14 @@
+{{ define "content" }}
+
+  <h1>Занимательные вещи, которые стоит увидеть</h1>
+
+  {{ range .Data }}
+    <section>
+      <h3>{{ .Title }}</h3>
+      <p>{{ .Text }}</p>
+
+      <time>Обновлено: {{ .CreatedAt.Format "02.01.2006" }}</time>
+    </section>
+  {{ end }}
+
+{{ end }}

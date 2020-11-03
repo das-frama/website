@@ -16,7 +16,7 @@ func NewPostRepo(s *Storage) post.Repository {
 	return &postRepo{s}
 }
 
-// FindBySlug returns a post with provided path.
+// FindByPath returns a post with provided path.
 func (r *postRepo) FindByPath(path string) (*post.Post, error) {
 	file, err := r.storage.FindFile(path)
 	if err != nil {

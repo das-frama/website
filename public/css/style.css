@@ -15,6 +15,7 @@ h2 {
 }
 
 h3 {
+  margin-top: .75rem;
   margin-bottom: .25rem;
 }
 
@@ -42,6 +43,9 @@ p {
 section {
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: .75rem;
+}
+section.no-border {
+  border-bottom: none;
 }
 
 section ul {

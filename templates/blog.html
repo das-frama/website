@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+  <h1>Блог</h1>
+
+  {{ range .Data }}
+    <section class="no-border">
+      <time datetime="{{ .CreatedAtFormatted }}">
+          {{ .CreatedAt.Format "02.01.2006" }}
+      </time>
+      &mdash;
+      <a href="{{ .Slug }}">{{ .Title }}</a>
+    </section>
+  {{ end }}
+
+{{ end }}
