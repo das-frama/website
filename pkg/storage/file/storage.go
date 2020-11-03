@@ -47,13 +47,13 @@ func (s *Storage) ScanDir(dir string) (map[string]*File, error) {
 // FindFile finds the file with provided path.
 func (s *Storage) FindFile(path string) (*File, error) {
 	dir := filepath.Dir(path)
-	// Get all files.
+	// GetAll all files.
 	files, err := s.ScanDir(dir)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get file.
+	// GetAll file.
 	file, ok := files[path]
 	if !ok {
 		return nil, ErrNotFound

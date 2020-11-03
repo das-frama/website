@@ -1,8 +1,10 @@
 package post
 
 import (
+	"fmt"
 	"net/http"
 	"path"
+	"strings"
 	"text/template"
 )
 
@@ -14,7 +16,7 @@ type viewData struct {
 
 // Handler provides http handlers for post model.
 type Handler interface {
-	Get(w http.ResponseWriter, r *http.Request)
+	GetAll(w http.ResponseWriter, r *http.Request)
 	GetByPath(w http.ResponseWriter, r *http.Request)
 }
 
@@ -34,36 +36,33 @@ func (h *handler) GetByPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	parts := strings.Split(r.URL.Path, "/")
 	files := []string{
 		"templates/layout.html",
-		"templates/blog.detail.html",
+		fmt.Sprintf("templates/%s.detail.html", parts[1]),
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", viewData{
-		Title: post.Title,
-		Data:  post,
+		Title:  post.Title,
+		Active: parts[1],
+		Data:   post,
 	})
 }
 
-func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	dir := path.Base(r.URL.Path)
 	posts, err := h.postService.FindAll(dir)
 	if err != nil {
 		h.ErrorHandler(w, r, http.StatusNotFound)
 		return
 	}
-	title := "Блог"
-	if dir == "poetry" {
-		title = "Стихи"
-	}
 
 	files := []string{
 		"templates/layout.html",
-		"templates/blog.html",
+		fmt.Sprintf("templates/%s.html", dir),
 	}
 	templates := template.Must(template.ParseFiles(files...))
 	templates.ExecuteTemplate(w, "layout", viewData{
-		Title:  title,
 		Active: dir,
 		Data:   posts,
 	})

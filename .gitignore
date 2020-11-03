@@ -11,6 +11,8 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Jetbrains internal files.
+.idea
 # VSCode internal files.
 .vscode
 
@@ -22,3 +24,5 @@ go.sum
 
 # Deploy.
 deploy.sh
+
+data/
