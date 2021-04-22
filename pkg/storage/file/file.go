@@ -20,8 +20,7 @@ type File struct {
 	Title     string
 	Content   []byte
 
-	root       string
-	isRendered bool
+	root string
 }
 
 // NewFile creates a new File struct .
@@ -101,6 +100,6 @@ func (f *File) FetchContent() error {
 		return err
 	}
 	// Render markdown.
-	f.Content = blackfriday.Run(input,  blackfriday.WithNoExtensions())
+	f.Content = blackfriday.Run(input, blackfriday.WithNoExtensions())
 	return nil
 }
