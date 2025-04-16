@@ -33,6 +33,7 @@ ul {
 }
 ul li {
     margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 img {
@@ -183,7 +184,8 @@ nav {
     height: auto;
 }
 
-nav a, nav a:visited {
+nav a,
+nav a:visited {
     display: block;
     margin-right: 0.875rem;
     color: #121216;
@@ -207,6 +209,13 @@ footer nav {
     padding-top: 0.5rem;
     margin-left: auto;
     width: fit-content;
+}
+
+footer nav a {
+    opacity: 0.66;
+}
+footer nav a:hover {
+    opacity: 1;
 }
 
 .ascii {
@@ -273,4 +282,8 @@ dl > dd {
 }
 dl > dd:last-child {
     margin-bottom: 0;
+}
+
+time {
+    opacity: 0.5;
 }

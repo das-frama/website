@@ -1,9 +1,12 @@
-{{ define "content" }}
+{{ define "content" }} {{ $post := .Data.Post }}
 
-  <article>
-      {{ $post := .Data }}
-      {{ $post.Text }}
-    <time class="muted" datetime="{{ $post.CreatedAtFormatted }}">Опубликовано: {{ $post.CreatedAt.Format "02.01.2006" }}</time>
-  </article>
+<article>
+    <h1>{{ $post.Title }}</h1>
+    <div>
+        <time datetime="{{ $post.CreatedAt }}"
+            >Опубликовано: {{ $post.CreatedAt.Format "02.01.2006" }}</time
+        >
+    </div>
+</article>
 
 {{ end }}

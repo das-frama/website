@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"slices"
 	"text/template"
 	"time"
 )
@@ -17,6 +18,7 @@ var (
 	data = flag.String("data", "data", "data's root path")
 )
 var db *sql.DB
+
 //go:embed templates/*.html
 var templateFS embed.FS
 
@@ -33,12 +35,19 @@ type TemplateData struct {
 	Data   map[string]any
 }
 
+type Post struct {
+	Title     string
+	Slug      string
+	CreatedAt time.Time
+}
 
 var pages = map[string]Page{
 	"index":       {"/", "Главная", handleIndex, []string{"index.html", "ascii.html"}},
 	"education":   {"/education", "Образование ", nil, []string{"education.html"}},
 	"thingsilike": {"/thingsilike", "Любимые вкусы", nil, []string{"thingsilike.html"}},
 	"skills":      {"/skills", "Умения", nil, []string{"skills.html"}},
+	"blog":        {"/blog", "Дневник", handleBlog, []string{"blog.html"}},
+	"blog.detail": {"/blog/{slug}", "Дневник", handleBlogDetail, []string{"blog.detail.html"}},
 }
 
 var jobs = []string{
@@ -59,6 +68,13 @@ var jobs = []string{
 	"работаю слесарем-сантехником – чиню то, то течёт, капает или не смывает.",
 	"стажируюсь техником в ростелекоме – устанавливаю роутеры, прокидываю витую пару, завожу вайфай.",
 	"верстаю афиши для цирковых представлений. В основном, просто переиспользую шаблон с разноцветными шариками.",
+}
+
+var posts = []Post{
+	{Title: "Работаю разнорабочим на линии упаковки", Slug: "work-as-packager", CreatedAt: time.Now()},
+	{Title: "Работаю грузчиком в мебельном центре", Slug: "work-as-freight", CreatedAt: time.Now()},
+	{Title: "Работаю слесарем-сантехником", Slug: "work-as-plumber", CreatedAt: time.Now().Add(-12 * time.Hour * 24)},
+	{Title: "Работаю электриком в «Жилкомсервисе»", Slug: "work-as-electrician", CreatedAt: time.Now()},
 }
 
 func main() {
@@ -106,6 +122,29 @@ func handleIndex(r *http.Request) map[string]any {
 	return map[string]any{
 		"Job":   jobs[rand.Intn(len(jobs))],
 		"Years": years,
+	}
+}
+
+func handleBlog(r *http.Request) map[string]any {
+	slices.SortFunc(posts, func(a Post, b Post) int {
+		return b.CreatedAt.Compare(a.CreatedAt)
+	})
+	return map[string]any{
+		"Posts": posts,
+	}
+}
+
+func handleBlogDetail(r *http.Request) map[string]any {
+	slug := r.PathValue("slug")
+	i := slices.IndexFunc(posts, func(p Post) bool {
+		return p.Slug == slug
+	})
+	if i == -1 {
+		return nil
+	}
+
+	return map[string]any{
+		"Post": posts[i],
 	}
 }
 
