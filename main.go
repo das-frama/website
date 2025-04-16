@@ -15,14 +15,31 @@ import (
 var (
 	port = flag.Int("port", 8000, "specify port number")
 	data = flag.String("data", "data", "data's root path")
-
-	db *sql.DB
-
-	//go:embed templates/*.html
-	templateFS embed.FS
-
-	pages map[string]*template.Template = make(map[string]*template.Template)
 )
+var db *sql.DB
+//go:embed templates/*.html
+var templateFS embed.FS
+
+type Page struct {
+	Path      string
+	Title     string
+	Handler   func(r *http.Request) map[string]any
+	Templates []string
+}
+
+type TemplateData struct {
+	Active string
+	Title  string
+	Data   map[string]any
+}
+
+
+var pages = map[string]Page{
+	"index":       {"/", "Главная", handleIndex, []string{"index.html", "ascii.html"}},
+	"education":   {"/education", "Образование ", nil, []string{"education.html"}},
+	"thingsilike": {"/thingsilike", "Любимые вкусы", nil, []string{"thingsilike.html"}},
+	"skills":      {"/skills", "Умения", nil, []string{"skills.html"}},
+}
 
 var jobs = []string{
 	"подрабатываю курьером – развожу еду и продукты всем подряд. Коплю на мопед.",
@@ -45,100 +62,55 @@ var jobs = []string{
 }
 
 func main() {
-	// Parse templates.
 	flag.Parse()
 
-	// Init DB.
+	// Инициализация БД.
 	var err error
 	db, err = initDB(fmt.Sprintf("%s/database.db", *data))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Parse templates for every page.
-	pages["index"] = template.Must(template.ParseFS(templateFS,
-		"templates/layout.html", "templates/index.html", "templates/ascii.html",
-	))
-	pages["education"] = template.Must(template.ParseFS(templateFS,
-		"templates/layout.html", "templates/education.html",
-	))
-	pages["thingsilike"] = template.Must(template.ParseFS(templateFS,
-		"templates/layout.html", "templates/thingsilike.html",
-	))
-	pages["skills"] = template.Must(template.ParseFS(templateFS,
-		"templates/layout.html", "templates/skills.html",
-	))
+	// Регистрация всех страниц.
+	for name, page := range pages {
+		tt := make([]string, 0, len(page.Templates)+1)
+		tt = append(tt, "templates/layout.html")
+		for _, t := range page.Templates {
+			tt = append(tt, fmt.Sprintf("templates/%s", t))
+		}
+		tmpl := template.Must(template.ParseFS(templateFS, tt...))
 
+		http.HandleFunc(page.Path, func(name string, page Page) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				data := TemplateData{name, page.Title, nil}
+				if page.Handler != nil {
+					data.Data = page.Handler(r)
+				}
+				render(w, tmpl, &data)
+			}
+		}(name, page))
+	}
 
-	// Serve.
-	http.HandleFunc("/", handleIndex)
-	http.HandleFunc("/education", handleEducation)
-	http.HandleFunc("/thingsilike", handleThingsilike)
-	http.HandleFunc("/skills", handleSkills)
+	// Статический контент.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	log.Printf("Server is running and working on http://localhost:%d\n", *port)
 	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
 
-type templateData struct {
-	Active string
-	Title  string
-	Data   map[string]any
-}
-
-func handleIndex(w http.ResponseWriter, r *http.Request) {
+func handleIndex(r *http.Request) map[string]any {
 	// Calculate how's old author.
 	birth := time.Date(1994, 02, 14, 0, 0, 0, 0, time.Local)
 	years := int(time.Since(birth).Hours() / 24 / 365)
 
-	// Get random job.
-	data := templateData{
-		Active: "index",
-		Title:  "Главная",
-		Data: map[string]any{
-			"Job":   jobs[rand.Intn(len(jobs))],
-			"Years": years,
-		},
+	return map[string]any{
+		"Job":   jobs[rand.Intn(len(jobs))],
+		"Years": years,
 	}
-
-	render(w, "index", &data)
 }
 
-func handleEducation(w http.ResponseWriter, r *http.Request) {
-	data := templateData{
-		Active: "education",
-		Title:  "Образование",
-	}
-
-	render(w, "education", &data)
-}
-
-func handleThingsilike(w http.ResponseWriter, r *http.Request) {
-	data := templateData{
-		Active: "thingsilike",
-		Title:  "Любимые вкусы",
-	}
-
-	render(w, "thingsilike", &data)
-}
-
-func handleSkills(w http.ResponseWriter, r *http.Request) {
-	data := templateData{
-		Active: "skills",
-		Title:  "Навыки",
-	}
-
-	render(w, "skills", &data)
-}
-
-func render(w http.ResponseWriter, name string, data *templateData) {
-	p, ok := pages[name]
-	if !ok {
-		http.Error(w, "Page not found", http.StatusNotFound)
-		return
-	}
-	if err := p.ExecuteTemplate(w, "layout", data); err != nil {
+func render(w http.ResponseWriter, tmpl *template.Template, data *TemplateData) {
+	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
 	}
 }
