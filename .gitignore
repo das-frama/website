@@ -26,3 +26,8 @@ go.sum
 deploy.sh
 
 data/
+
+tmp
+website
+
+.DS_Store
