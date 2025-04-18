@@ -1,15 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"embed"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"math/rand"
 	"net/http"
 	"slices"
-	"text/template"
 	"time"
 )
 
@@ -17,9 +16,8 @@ var (
 	port = flag.Int("port", 8000, "specify port number")
 	data = flag.String("data", "data", "data's root path")
 )
-var db *sql.DB
 
-//go:embed templates/*.html
+//go:embed templates
 var templateFS embed.FS
 
 type Page struct {
@@ -81,9 +79,7 @@ func main() {
 	flag.Parse()
 
 	// Инициализация БД.
-	var err error
-	db, err = initDB(fmt.Sprintf("%s/database.db", *data))
-	if err != nil {
+	if err := initDB(fmt.Sprintf("%s/database.db", *data)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -106,6 +102,9 @@ func main() {
 			}
 		}(name, page))
 	}
+
+	// Регистрация админстраторской части.
+	registerAdminRoutes()
 
 	// Статический контент.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
@@ -148,8 +147,10 @@ func handleBlogDetail(r *http.Request) map[string]any {
 	}
 }
 
-func render(w http.ResponseWriter, tmpl *template.Template, data *TemplateData) {
+func render(w http.ResponseWriter, tmpl *template.Template, data *TemplateData) error {
 	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
+		return err
 	}
+	return nil
 }

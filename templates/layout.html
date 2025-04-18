@@ -15,16 +15,13 @@
     <body>
         <header>
             <nav>
-                 <a {{ if eq .Active "index" }} class="active" {{ end }} id="name" href="/">
-                     <h1>Андрей Галактионов</h1>
-                 </a>
-                <!-- <a {{ if eq .Active "project" }} class="active" {{ end }} href="/project">[Проекты]</a> -->
+                <a {{ if eq .Active "index" }} class="active" {{ end }} id="name" href="/">
+                    <h1>Андрей Галактионов</h1>
+                </a>
                 <a {{ if eq .Active "thingsilike" }} class="active" {{ end }} href="/thingsilike">[Интересы]</a>
                 <a {{ if eq .Active "education" }} class="active" {{ end }} href="/education">[Образование]</a>
                 <a {{ if eq .Active "skills" }} class="active" {{ end }} href="/skills">[Умения]</a>
                 <a {{ if eq .Active "blog" }} class="active" {{ end }} href="/blog">[Дневник]</a>
-                <!-- <a href="/about">[Обо мне]</a> -->
-                <!-- <a href="/likes">[Что я люблю]</a> -->
             </nav>
         </header>
         <main>{{ block "content" .}}{{ end }}</main>
@@ -33,10 +30,10 @@
                 <a href="tg://resolve?domain=das_frama" target="_blank">телеграм</a>
                 <a href="https://github.com/das-frama" target="_blank">гитхаб</a>
                 <!-- <a href="https://x.com/das_frama" target="_blank">икс</a> -->
-                <!-- <a href="https://vk.com/das_frama" target="_blank">вк</a> -->
                 <a href="mailto:das.frama@gmail.com">das.frama@gmail.com</a>
             </nav>
         </footer>
+        <script src="/static/js/script.js"></script>
     </body>
 </html>
 {{ end }}

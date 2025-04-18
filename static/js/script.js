@@ -42,3 +42,103 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // animateText();
 });
+
+function bufferDecode(b64) {
+  const pad = "=".repeat((4 - (b64.length % 4)) % 4);
+  const base64 = (b64 + pad).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+}
+
+function bufferEncode(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const bin = String.fromCharCode(...bytes);
+  const base64 = btoa(bin);
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function setupCredentials() {
+  const { publicKey } = await fetch("/sudo/registration/begin").then((r) =>
+    r.json(),
+  );
+
+  publicKey.challenge = bufferDecode(publicKey.challenge);
+  publicKey.user.id = bufferDecode(publicKey.user.id);
+  if (publicKey.excludeCredentials) {
+    for (var i = 0; i < publicKey.excludeCredentials.length; i++) {
+      publicKey.excludeCredentials[i].id = bufferDecode(
+        publicKey.excludeCredentials[i].id,
+      );
+    }
+  }
+  console.log(publicKey);
+
+  var cred;
+  try {
+    cred = await navigator.credentials.create({ publicKey });
+    console.log(cred);
+  } catch (err) {
+    if (err.name === "InvalidStateError") {
+      alert("Устройство уже зарегистрировано");
+      return;
+    }
+    console.error(err);
+  }
+
+  const response2 = await fetch("/sudo/registration/finish", {
+    method: "POST",
+    body: JSON.stringify({
+      id: cred.id,
+      rawId: bufferEncode(cred.rawId),
+      type: cred.type,
+      response: {
+        clientDataJSON: bufferEncode(cred.response.clientDataJSON),
+        attestationObject: bufferEncode(cred.response.attestationObject),
+      },
+    }),
+  });
+  console.log(response2.ok);
+}
+
+async function loginCredentials() {
+  const { publicKey } = await fetch("/sudo/login/begin").then((r) => r.json());
+
+  publicKey.challenge = bufferDecode(publicKey.challenge);
+  publicKey.allowCredentials.forEach((item) => {
+    item.id = bufferDecode(item.id);
+  });
+  console.log(publicKey);
+
+  var cred;
+  try {
+    cred = await navigator.credentials.get({ publicKey });
+    console.log(cred);
+  } catch (err) {
+    if (err.name === "InvalidStateError") {
+      alert("Устройство уже зарегистрировано");
+      return;
+    }
+    console.error(err);
+  }
+
+  const response2 = await fetch("/sudo/login/finish", {
+    method: "POST",
+    body: JSON.stringify({
+      id: cred.id,
+      rawId: bufferEncode(cred.rawId),
+      type: cred.type,
+      response: {
+        authenticatorData: bufferEncode(cred.response.authenticatorData),
+        clientDataJSON: bufferEncode(cred.response.clientDataJSON),
+        signature: bufferEncode(cred.response.signature),
+        userHandle: bufferEncode(cred.response.userHandle),
+      },
+    }),
+    credentials: "include",
+  });
+  if (response2.redirected) {
+    window.location.href = response2.url;
+  } else {
+    console.error(response2);
+  }
+}
