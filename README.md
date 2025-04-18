@@ -1,10 +1,10 @@
 # Simple yet beautiful Golang website
 
 ## Build
-`go build cmd/server/server.go`
+`go build .`
 
 ## Run
-`./server` - runs with default options. (`8000` port and `data` dir)
+`./website` - runs with default options. (`8000` port and `data` dir)
 
 ## Flags
 `-port` - port for http server
