@@ -1,0 +1,11 @@
+{{ define "content" }}
+
+<h1>register device for user</h1>
+
+<form action="/sudo/register/otp" method="POST" class="card">
+    <div class="flex">
+        <input placeholder="one time password" type="number" inputmode="numeric" name="otp" />
+        <button type="submit">Войти</button>
+    </div>
+</form>
+{{ end }}

@@ -115,7 +115,7 @@ func finishRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	http.Redirect(w, r, "/sudo/login", http.StatusSeeOther)
 }
 
 func beginLoginHandler(w http.ResponseWriter, r *http.Request) {

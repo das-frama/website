@@ -97,7 +97,12 @@ async function setupCredentials() {
       },
     }),
   });
-  console.log(response2.ok);
+
+  if (response2.redirected) {
+    window.location.href = response2.url;
+  } else {
+    console.error(response2);
+  }
 }
 
 async function loginCredentials() {

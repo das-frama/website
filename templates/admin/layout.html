@@ -12,10 +12,10 @@
     <body>
         <header>
             <nav>
-                <a {{ if eq .Active "index" }} class="active" {{ end }} id="name" href="/">
+                <a {{ if eq .Active "home" }} class="active" {{ end }} href="/sudo/home">
                     <h2>sudo panel</h2>
                 </a>
-                <a {{ if eq .Active "blog" }} class="active" {{ end }} href="/blog">[posts]</a>
+                <a {{ if eq .Active "blog" }} class="active" {{ end }} href="/sudo/blog">[posts]</a>
             </nav>
         </header>
         <main>{{ block "content" .}}{{ end }}</main>

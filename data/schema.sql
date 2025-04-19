@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS superusers (
     name string NOT NULL,
     credentials TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    verified BOOLEAN DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

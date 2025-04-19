@@ -29,6 +29,7 @@ type User struct {
 	ID          int
 	Name        string
 	Credentials []webauthn.Credential
+	Verified    bool
 	CreatedAt   time.Time
 }
 
@@ -73,12 +74,15 @@ func getUser(ctx context.Context, id int) (*User, error) {
 	var rawCreds string
 
 	err := db.QueryRowContext(ctx, "SELECT * FROM superusers WHERE id = ?", id).
-		Scan(&user.ID, &user.Name, &rawCreds, &user.CreatedAt)
+		Scan(&user.ID, &user.Name, &rawCreds, &user.CreatedAt, &user.Verified)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal([]byte(rawCreds), &user.Credentials); err != nil {
-		return nil, err
+
+	if rawCreds != "" {
+		if err := json.Unmarshal([]byte(rawCreds), &user.Credentials); err != nil {
+			return nil, err
+		}
 	}
 
 	return user, nil
@@ -88,8 +92,8 @@ func saveUser(ctx context.Context, user *User) error {
 	creds, _ := json.Marshal(user.Credentials)
 	if user.ID == 0 {
 		// Create.
-		res, err := db.ExecContext(ctx, "INSERT INTO superusers (name, credentials) VALUES (?, ?)",
-			user.Name, string(creds))
+		res, err := db.ExecContext(ctx, "INSERT INTO superusers (name, credentials, verified) VALUES (?, ?, ?)",
+			user.Name, string(creds), user.Verified)
 		if err != nil {
 			return err
 		}
@@ -100,8 +104,8 @@ func saveUser(ctx context.Context, user *User) error {
 	}
 
 	// Update.
-	_, err := db.ExecContext(ctx, "UPDATE superusers SET name=?, credentials=? WHERE id=?",
-		user.Name, string(creds), user.ID)
+	_, err := db.ExecContext(ctx, "UPDATE superusers SET name=?, credentials=?, verified=? WHERE id=?",
+		user.Name, string(creds), user.Verified, user.ID)
 
 	return err
 }
