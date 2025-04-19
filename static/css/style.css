@@ -238,7 +238,7 @@ footer nav a:hover {
 .row {
     display: flex;
     width: 100%;
-    align-items: end;
+    align-items: start;
 }
 .row > * {
     margin-right: 1.5rem;

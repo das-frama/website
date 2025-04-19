@@ -71,12 +71,7 @@ var jobs = []string{
 	"верстаю афиши для цирковых представлений. В основном, просто переиспользую шаблон с разноцветными шариками.",
 }
 
-var posts = []Post{
-	{Title: "Работаю разнорабочим на линии упаковки", Slug: "work-as-packager", CreatedAt: time.Now()},
-	{Title: "Работаю грузчиком в мебельном центре", Slug: "work-as-freight", CreatedAt: time.Now()},
-	{Title: "Работаю слесарем-сантехником", Slug: "work-as-plumber", CreatedAt: time.Now().Add(-12 * time.Hour * 24)},
-	{Title: "Работаю электриком в «Жилкомсервисе»", Slug: "work-as-electrician", CreatedAt: time.Now()},
-}
+var posts = []Post{ }
 
 var secret string
 

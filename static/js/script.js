@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       from = 0;
 
     animate({
-      duration: 5000,
+      duration: 1000,
       timing: bounce,
       draw: function (progress) {
         var result = (to - from) * progress + from;
@@ -16,8 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function bounce(timeFraction) {
-    return timeFraction;
+  function bounce(x) {
+    // return 1 - Math.cos((x * Math.PI) / 2);
+    return x;
   }
 
   function animate({ duration, draw, timing }) {
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // animateText();
+  animateText();
 });
 
 function bufferDecode(b64) {
