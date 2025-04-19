@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"flag"
 	"fmt"
@@ -8,6 +9,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/exec"
 	"slices"
 	"time"
 )
@@ -75,7 +78,16 @@ var posts = []Post{
 	{Title: "Работаю электриком в «Жилкомсервисе»", Slug: "work-as-electrician", CreatedAt: time.Now()},
 }
 
+var secret string
+
 func main() {
+	// Пытаемся дешифровать файл с мастер-паролем.
+	var err error
+	secret, err = decodeSecretPassword(".key.gpg")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	flag.Parse()
 
 	// Инициализация БД.
@@ -111,6 +123,21 @@ func main() {
 
 	log.Printf("Server is running and working on http://localhost:%d\n", *port)
 	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+}
+
+func decodeSecretPassword(filepath string) (string, error) {
+	cmd := exec.Command("gpg", "--quiet", "--decrypt", filepath)
+
+	var out bytes.Buffer
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = &out
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return string(out.Bytes()), nil
 }
 
 func handleIndex(r *http.Request) map[string]any {

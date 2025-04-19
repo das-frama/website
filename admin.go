@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base32"
+	"encoding/binary"
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 func registerAdminRoutes() {
 	http.HandleFunc("GET /sudo/login", adminShowLoginHandler)
-	http.HandleFunc("POST /sudo/login", adminPostLoginHandler)
 
 	http.HandleFunc("GET /sudo/registration/begin", beginRegistrationHandler)
 	http.HandleFunc("POST /sudo/registration/finish", finishRegistrationHandler)
@@ -25,21 +29,21 @@ func adminShowLoginHandler(w http.ResponseWriter, r *http.Request) {
 	render(w, tmpl, nil)
 }
 
-func adminPostLoginHandler(w http.ResponseWriter, r *http.Request) {
-	// Высчитать динамический пароль.
-	// pass := getPassword()
-
-	w.Header().Set("Content-Type", "text/plain; charset=utf8")
-	// w.Write(pass)
-}
-
 func adminHomeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("home handler")
 	tmpl := template.Must(template.ParseFS(templateFS, "templates/admin/layout.html", "templates/admin/home.html"))
+
+	key, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(secret)
+	if err != nil {
+		log.Fatalf("Failed to decode Base32 key: %v", err)
+	}
+
 	render(w, tmpl, &TemplateData{
 		Active: "home",
-		Title: "Home",
-
+		Title:  "Home",
+		Data: map[string]any{
+			"OTP": getTOTP(key),
+		},
 	})
 }
 
@@ -71,4 +75,28 @@ func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 
 		next(w, r.WithContext(ctx))
 	}
+}
+
+func getTOTP(key []byte) uint32 {
+	// Ensure TOTP value is properly padded with leading zeros
+	t := time.Now().UTC().Unix() / 30
+	msg := make([]byte, 8)
+	binary.BigEndian.PutUint64(msg, uint64(t))
+
+	mac := hmac.New(sha1.New, key)
+	mac.Write(msg)
+	hash := mac.Sum(nil)
+
+	offset := int(hash[len(hash)-1] & 0xf) // Fix potential off-by-one error
+	if offset+4 > len(hash) {
+		offset = len(hash) - 4 // Ensure we don't overflow
+	}
+	trunc := binary.BigEndian.Uint32(hash[offset : offset+4]) // Use explicit slice range
+	trunc = trunc & 0x7fffffff
+
+	otp := trunc % 1000000
+	if otp < 100000 { // Make sure we have a 6-digit number
+		otp += 100000
+	}
+	return uint32(otp)
 }
