@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS superusers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name string NOT NULL,
     credentials TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     verified BOOLEAN DEFAULT 1
 );
 
