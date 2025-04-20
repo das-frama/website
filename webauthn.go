@@ -51,8 +51,8 @@ var sessionStore *webauthn.SessionData
 func init() {
 	wconfig := &webauthn.Config{
 		RPDisplayName: "my site",
-		RPID:          "localhost",
-		RPOrigins:     []string{"http://localhost:8000"},
+		RPID:          "das-frama.ru",
+		RPOrigins:     []string{"http://localhost:8000", "https://das-frama.ru"},
 	}
 
 	var err error

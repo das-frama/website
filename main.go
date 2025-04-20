@@ -43,12 +43,12 @@ type Post struct {
 }
 
 var pages = map[string]Page{
-	"index":       {"/", "Главная", handleIndex, []string{"index.html", "ascii.html"}},
-	"education":   {"/education", "Образование ", nil, []string{"education.html"}},
-	"thingsilike": {"/thingsilike", "Любимые вкусы", nil, []string{"thingsilike.html"}},
-	"skills":      {"/skills", "Умения", nil, []string{"skills.html"}},
-	"blog":        {"/blog", "Дневник", handleBlog, []string{"blog.html"}},
-	"blog.detail": {"/blog/{slug}", "Дневник", handleBlogDetail, []string{"blog.detail.html"}},
+	"index":       {"GET /{$}", "Главная", handleIndex, []string{"index.html", "ascii.html"}},
+	"education":   {"GET /education", "Образование ", nil, []string{"education.html"}},
+	"thingsilike": {"GET /thingsilike", "Любимые вкусы", nil, []string{"thingsilike.html"}},
+	"skills":      {"GET /skills", "Умения", nil, []string{"skills.html"}},
+	"blog":        {"GET /blog", "Дневник", handleBlog, []string{"blog.html"}},
+	"blog.detail": {"GET /blog/{slug}", "Дневник", handleBlogDetail, []string{"blog.detail.html"}},
 }
 
 var jobs = []string{
