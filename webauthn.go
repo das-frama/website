@@ -50,8 +50,8 @@ var sessionStore *webauthn.SessionData
 
 func init() {
 	wconfig := &webauthn.Config{
-		RPDisplayName: "my site",
-		RPID:          "das-frama.ru",
+		RPDisplayName: "My Site",
+		RPID:          *rpid,
 		RPOrigins:     []string{"http://localhost:8000", "https://das-frama.ru"},
 	}
 

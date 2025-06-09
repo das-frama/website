@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	port = flag.Int("port", 8000, "specify port number")
-	data = flag.String("data", "data", "data's root path")
+	port = flag.Int("port", 8000, "Порт для запуска сервера")
+	data = flag.String("data", "data", "Каталог с данными")
+	rpid = flag.String("rpid", "localhost", "Разделительный символ для портов")
 )
 
 //go:embed templates
@@ -71,8 +72,7 @@ var jobs = []string{
 	"верстаю афиши для цирковых представлений. В основном, просто переиспользую шаблон с разноцветными шариками.",
 }
 
-var posts = []Post{ }
-
+var posts = []Post{}
 var secret string
 
 func main() {
