@@ -53,6 +53,13 @@ a:hover {
 }
 
 @font-face {
+    font-family: "DepartureMono";
+    src: url("../fonts/DepartureMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
     font-family: "GeistMono";
     src: url("../fonts/GeistMono-UltraLight.woff2") format("woff2");
     font-weight: 200;
@@ -124,7 +131,7 @@ a:hover {
 
 body {
     background-color: #e8e6e1;
-    font-family: "GeistMono", sans-serif;
+    font-family: "DepartureMono", sans-serif;
     max-width: 960px;
     width: 100%;
     margin: 5rem 10rem 0;
@@ -175,6 +182,10 @@ main {
 
 main > section {
     margin-bottom: 2rem;
+}
+
+section {
+    margin-top: 1rem;
 }
 
 nav {
@@ -292,8 +303,13 @@ time {
     opacity: 0.5;
 }
 
+form {
+    max-width: 550px;
+}
+
 label {
-    display: block;
+    display: flex;
+    align-items: center;
     margin-bottom: 0.25rem;
 }
 
@@ -301,12 +317,24 @@ input, button {
     font-family: 'Geist Mono', monospace;
 }
 
-input {
+input, textarea {
     display: block;
     border: 2px solid #121216;
     font-size: 1rem;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
+    /* border-radius: 0.25rem; */
+    width: 100%;
+    font-family: inherit;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    margin-bottom: 0;
+    margin-right: 0.25rem;
+    display: inline-flex;
+    width: 20px;
+    border: 0;
+    height: 20px;
+    accent-color: #121216;
 }
 
 input:focus {
@@ -318,9 +346,16 @@ button {
     background-color: #f8f8f6;
     padding: 0.25rem 0.5rem;
     font-size: 1rem;
-    border-radius: 0.25rem;
+    /* border-radius: 0.25rem; */
 }
 
 button:hover {
     background-color: #eaeaea;
+}
+
+fieldset {
+    background: lightgray;
+}
+fieldset > div {
+    margin-bottom: 1rem;
 }

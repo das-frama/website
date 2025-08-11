@@ -41,6 +41,15 @@ type Session struct {
 	ExpiresAt time.Time
 }
 
+type Post struct {
+	ID        int
+	Title     string
+	Slug      string
+	Text      string
+	Active    bool
+	CreatedAt time.Time
+}
+
 // initDB initializes the database and creates the schema if it doesn't exist.
 func initDB(path string) error {
 	isNew := false
@@ -140,4 +149,26 @@ func saveSession(ctx context.Context, session *Session) error {
 		session.UserID, session.Token, session.ExpiresAt)
 
 	return err
+}
+
+func savePost(ctx context.Context, post *Post) error {
+	if post.ID == 0 {
+		// Create.
+		res, err := db.ExecContext(ctx, "INSERT INTO posts (title, slug, text, active) VALUES (?, ?, ?, ?)",
+			post.Title, post.Slug, post.Text, post.Active)
+		if err != nil {
+			return err
+		}
+		id, _ := res.LastInsertId()
+		post.ID = int(id)
+		post.CreatedAt = time.Now()
+		return nil
+	}
+
+	// Update.
+	_, err := db.ExecContext(ctx, "UPDATE posts SET title=?, slug=?, text=?, active=? WHERE id=?",
+		post.Title, post.Slug, post.Text, post.Active)
+
+	return err
+
 }

@@ -37,12 +37,6 @@ type TemplateData struct {
 	Data   map[string]any
 }
 
-type Post struct {
-	Title     string
-	Slug      string
-	CreatedAt time.Time
-}
-
 var pages = map[string]Page{
 	"index":       {"GET /{$}", "Главная", handleIndex, []string{"index.html", "ascii.html"}},
 	"education":   {"GET /education", "Образование ", nil, []string{"education.html"}},
@@ -132,7 +126,7 @@ func decodeSecretPassword(filepath string) (string, error) {
 		return "", err
 	}
 
-	return string(out.Bytes()), nil
+	return out.String(), nil
 }
 
 func handleIndex(r *http.Request) map[string]any {

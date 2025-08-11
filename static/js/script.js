@@ -1,48 +1,43 @@
-// dom content loaded
-document.addEventListener("DOMContentLoaded", () => {
-  function animateText() {
-    var ascii = document.getElementById("ascii");
-    var text = ascii.textContent;
-    var to = text.length,
-      from = 0;
+function animateText() {
+  var ascii = document.getElementById("ascii");
+  var text = ascii.textContent;
+  var to = text.length,
+    from = 0;
 
-    animate({
-      duration: 1000,
-      timing: bounce,
-      draw: function (progress) {
-        var result = (to - from) * progress + from;
-        ascii.textContent = text.slice(0, Math.ceil(result));
-      },
-    });
-  }
+  animate({
+    duration: 1000,
+    timing: bounce,
+    draw: function (progress) {
+      var result = (to - from) * progress + from;
+      ascii.textContent = text.slice(0, Math.ceil(result));
+    },
+  });
+}
 
-  function bounce(x) {
-    // return 1 - Math.cos((x * Math.PI) / 2);
-    return x;
-  }
+function bounce(x) {
+  // return 1 - Math.cos((x * Math.PI) / 2);
+  return x;
+}
 
-  function animate({ duration, draw, timing }) {
-    var start = performance.now();
+function animate({ duration, draw, timing }) {
+  var start = performance.now();
 
-    const raf = requestAnimationFrame(function animate(time) {
-      var timeFraction = (time - start) / duration;
-      if (timeFraction > 1) {
-        timeFraction = 1;
-        cancelAnimationFrame(raf);
-      }
+  const raf = requestAnimationFrame(function animate(time) {
+    var timeFraction = (time - start) / duration;
+    if (timeFraction > 1) {
+      timeFraction = 1;
+      cancelAnimationFrame(raf);
+    }
 
-      var progress = timing(timeFraction);
+    var progress = timing(timeFraction);
 
-      draw(progress);
+    draw(progress);
 
-      if (timeFraction < 1) {
-        requestAnimationFrame(animate);
-      }
-    });
-  }
-
-  animateText();
-});
+    if (timeFraction < 1) {
+      requestAnimationFrame(animate);
+    }
+  });
+}
 
 function bufferDecode(b64) {
   const pad = "=".repeat((4 - (b64.length % 4)) % 4);
