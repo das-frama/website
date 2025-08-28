@@ -24,16 +24,24 @@ func decodeSecret() []byte {
 }
 
 func registerAdminRoutes() {
+	// Login.
 	http.HandleFunc("GET /sudo/register", adminShowRegisterHandler)
 	http.HandleFunc("POST /sudo/register/otp", adminRegisterOTPHandler)
 	http.HandleFunc("GET /sudo/login", adminShowLoginHandler)
 
+	// Registration.
 	http.HandleFunc("GET /sudo/registration/begin", beginRegistrationHandler)
 	http.HandleFunc("POST /sudo/registration/finish", finishRegistrationHandler)
 	http.HandleFunc("GET /sudo/login/begin", beginLoginHandler)
 	http.HandleFunc("POST /sudo/login/finish", finishLoginHandler)
 
+	// Home.
 	http.HandleFunc("GET /sudo/home", requireAuth(adminHomeHandler))
+
+	// Posts.
+	http.HandleFunc("GET /sudo/posts", requireAuth(adminPostIndexHandler));
+	http.HandleFunc("GET /sudo/posts/create", requireAuth(adminPostCreateHandler));
+	http.HandleFunc("POST /sudo/posts/create", requireAuth(adminPostStoreHandler));
 }
 
 // adminShowRegisterHandler отображает регистрацию для админов.

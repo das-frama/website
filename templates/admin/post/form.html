@@ -1,0 +1,29 @@
+{{ define "form" }}
+
+<form method="POST" action="">
+    <fieldset>
+        <legend>Пост</legend>
+
+        <div>
+            <label for="title">Заголовок</label>
+            <input id="title" type="text" name="title" required />
+        </div>
+
+        <div>
+            <label for="slug">Slug</label>
+            <input id="slug" type="text" name="slug" required pattern="[a-z0-9-]+" />
+        </div>
+        <div>
+            <label for="text">Текст</label>
+            <textarea id="text" required name="text"></textarea>
+        </div>
+        <label>
+            <input type="checkbox" name="active" />
+            Активный
+        </label>
+
+        <button type="submit" >Отправить</button>
+    </fieldset>
+</form>
+
+{{ end }}
