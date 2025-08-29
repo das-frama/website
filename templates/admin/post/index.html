@@ -3,4 +3,15 @@
 
 <section>Здесь будут посты</section>
 
+<div class="post-list">
+  {{ range .Data.Posts }}
+    <p>
+      #{{ .ID }}
+      <a class="underline" href="/sudo/posts/{{ .ID }}">{{ .Title }}</a>
+      <time datetime="{{ .CreatedAt }}"> {{ .CreatedAt }} </time>
+      <a href="/sudo/posts/{{ .ID }}/delete" data-method="post" data-confirm="Уверен, что хочешь удалить этот пост?">удалить</a>
+    </p>
+  {{ end }}
+</div>
+
 {{ end }}

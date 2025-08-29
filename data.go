@@ -77,7 +77,7 @@ func initDB(path string) error {
 	return nil
 }
 
-func getUser(ctx context.Context, id int) (*User, error) {
+func getUserById(ctx context.Context, id int) (*User, error) {
 	user := &User{}
 
 	var rawCreds string
@@ -119,7 +119,7 @@ func saveUser(ctx context.Context, user *User) error {
 	return err
 }
 
-func getSession(ctx context.Context, token string) (*Session, error) {
+func getSessionByToken(ctx context.Context, token string) (*Session, error) {
 	session := &Session{}
 	err := db.QueryRowContext(ctx, "SELECT * FROM sessions WHERE token = ?", token).
 		Scan(&session.ID, &session.UserID, &session.Token, &session.ExpiresAt, &session.CreatedAt)
@@ -151,6 +151,43 @@ func saveSession(ctx context.Context, session *Session) error {
 	return err
 }
 
+// getPostById retrieves a post by its ID from the database.
+func getPostById(ctx context.Context, id int) (Post, error) {
+	var post Post
+	err := db.QueryRowContext(ctx, "SELECT id, slug, title, text, active FROM posts WHERE id = ?", id).
+		Scan(&post.ID, &post.Slug, &post.Title, &post.Text, &post.Active)
+	if err != nil {
+		return post, err
+	}
+
+	return post, nil
+
+}
+
+// listPosts lists all posts from the database.
+func listPosts(ctx context.Context) ([]Post, error) {
+	rows, err := db.QueryContext(ctx, "SELECT id, slug, title, text, active, created_at FROM posts ORDER BY created_at DESC")
+	if err != nil {
+		return nil, fmt.Errorf("Error while fecthing posts: %v", err);
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var p Post
+		if err := rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Text, &p.Active, &p.CreatedAt); err != nil {
+			return nil, fmt.Errorf("Error while scaning post: %v", err)
+		}
+		posts = append(posts, p)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+// savePost saves a post to the database.
 func savePost(ctx context.Context, post *Post) error {
 	if post.ID == 0 {
 		// Create.
@@ -167,8 +204,17 @@ func savePost(ctx context.Context, post *Post) error {
 
 	// Update.
 	_, err := db.ExecContext(ctx, "UPDATE posts SET title=?, slug=?, text=?, active=? WHERE id=?",
-		post.Title, post.Slug, post.Text, post.Active)
+		post.Title, post.Slug, post.Text, post.Active, post.ID)
 
 	return err
+}
 
+// deletePost deletes a post from the database.
+func deletePost(ctx context.Context, post *Post) error {
+	if post.ID == 0 {
+		return fmt.Errorf("Пустой post, в котором нет ID")
+	}
+
+	_, err := db.ExecContext(ctx, "DELETE FROM posts WHERE id = ?", post.ID)
+	return err
 }

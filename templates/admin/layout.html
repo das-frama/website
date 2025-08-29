@@ -7,6 +7,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <link rel="stylesheet" href="/static/css/style.css" />
         <title>{{ .Title }} – sudo panel</title>
+        {{ block "styles" . }}{{ end }}
     </head>
 
     <body>
@@ -19,6 +20,9 @@
             </nav>
         </header>
         <main>{{ block "content" .}}{{ end }}</main>
+
+        {{ block "scripts" . }}{{ end }}
+        <script src="/static/js/admin_script.js"></script>
     </body>
 </html>
 {{ end }}

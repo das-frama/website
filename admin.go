@@ -39,14 +39,17 @@ func registerAdminRoutes() {
 	http.HandleFunc("GET /sudo/home", requireAuth(adminHomeHandler))
 
 	// Posts.
-	http.HandleFunc("GET /sudo/posts", requireAuth(adminPostIndexHandler));
-	http.HandleFunc("GET /sudo/posts/create", requireAuth(adminPostCreateHandler));
-	http.HandleFunc("POST /sudo/posts/create", requireAuth(adminPostStoreHandler));
+	http.HandleFunc("GET /sudo/posts", requireAuth(adminPostIndexHandler))
+	http.HandleFunc("GET /sudo/posts/create", requireAuth(adminPostCreateHandler))
+	http.HandleFunc("POST /sudo/posts/create", requireAuth(adminPostStoreHandler))
+	http.HandleFunc("GET /sudo/posts/{id}", requireAuth(adminPostEditHandler))
+	http.HandleFunc("POST /sudo/posts/{id}", requireAuth(adminPostUpdateHandler))
+	http.HandleFunc("POST /sudo/posts/{id}/delete", requireAuth(adminPostDeleteHandler))
 }
 
 // adminShowRegisterHandler отображает регистрацию для админов.
 func adminShowRegisterHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := getUser(r.Context(), 1)
+	user, err := getUserById(r.Context(), 1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -64,7 +67,7 @@ func adminShowRegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminRegisterOTPHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := getUser(r.Context(), 1)
+	user, err := getUserById(r.Context(), 1)
 	if err != nil {
 		http.Error(w, "Пользователь не найден", http.StatusNotFound)
 		return
@@ -124,14 +127,14 @@ func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// Check session.
-		session, err := getSession(r.Context(), cookie.Value)
+		session, err := getSessionByToken(r.Context(), cookie.Value)
 		if err != nil {
 			http.Error(w, "Сессия не найдена.", http.StatusUnauthorized)
 			return
 		}
 
 		// Find user.
-		user, err := getUser(r.Context(), session.UserID)
+		user, err := getUserById(r.Context(), session.UserID)
 		if err != nil {
 			http.Error(w, "Пользователь не найден.", http.StatusUnauthorized)
 			return

@@ -93,7 +93,12 @@ func main() {
 		for _, t := range page.Templates {
 			tt = append(tt, fmt.Sprintf("templates/%s", t))
 		}
-		tmpl := template.Must(template.ParseFS(templateFS, tt...))
+		tmpl := template.Must(template.ParseFS(templateFS, tt...)).Funcs(template.FuncMap{
+			"toMoscow": func(t time.Time) time.Time {
+				loc, _ := time.LoadLocation("Europe/Moscow")
+				return t.In(loc)
+			},
+		})
 
 		http.HandleFunc(page.Path, func(name string, page Page) http.HandlerFunc {
 			return func(w http.ResponseWriter, r *http.Request) {
@@ -167,7 +172,7 @@ func handleBlogDetail(r *http.Request) map[string]any {
 
 func render(w http.ResponseWriter, tmpl *template.Template, data *TemplateData) error {
 	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
-		http.Error(w, "Template error", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
 		return err
 	}
 	return nil

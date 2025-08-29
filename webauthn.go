@@ -64,7 +64,7 @@ func init() {
 
 func beginRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user.
-	user, err := getUser(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
+	user, err := getUserById(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
 	if err == sql.ErrNoRows {
 		http.Error(w, "Нет такого пользователя", http.StatusNotFound)
 		return
@@ -93,7 +93,7 @@ func beginRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 
 func finishRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user.
-	user, err := getUser(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
+	user, err := getUserById(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
 	if err == sql.ErrNoRows {
 		http.Error(w, "Нет такого пользователя", http.StatusNotFound)
 		return
@@ -120,7 +120,7 @@ func finishRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 
 func beginLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user.
-	user, err := getUser(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
+	user, err := getUserById(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
 	if err == sql.ErrNoRows {
 		http.Error(w, "Нет такого пользователя", http.StatusNotFound)
 		return
@@ -146,7 +146,7 @@ func beginLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func finishLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user.
-	user, err := getUser(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
+	user, err := getUserById(r.Context(), 1) // Todo: подумать стоит ли искать id == 1
 	if err == sql.ErrNoRows {
 		http.Error(w, "Нет такого пользователя", http.StatusNotFound)
 		return

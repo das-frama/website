@@ -1,29 +1,86 @@
-{{ define "form" }}
+{{ define "styles" }}
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/pell/dist/pell.min.css" />
+{{ end }} {{ define "form" }}
 
 <form method="POST" action="">
-    <fieldset>
-        <legend>Пост</legend>
+  <fieldset>
+    <legend>Пост</legend>
 
-        <div>
-            <label for="title">Заголовок</label>
-            <input id="title" type="text" name="title" required />
-        </div>
+    <div>
+      <label for="title">Заголовок</label>
+      <input id="title" type="text" name="title" required value="{{ .Data.Post.Title }}" />
+    </div>
 
-        <div>
-            <label for="slug">Slug</label>
-            <input id="slug" type="text" name="slug" required pattern="[a-z0-9-]+" />
-        </div>
-        <div>
-            <label for="text">Текст</label>
-            <textarea id="text" required name="text"></textarea>
-        </div>
-        <label>
-            <input type="checkbox" name="active" />
-            Активный
-        </label>
+    <div>
+      <label for="slug">Slug</label>
+      <input id="slug" type="text" name="slug" required pattern="[a-z0-9-]+" value="{{ .Data.Post.Slug }}" />
+    </div>
+    <div>
+      <input type="hidden" name="text" id="post-text" value="{{ .Data.Post.Text }}" />
+      <label for="pell-editor">Текст</label>
+      <div id="pell-editor" class="pell"></div>
+    </div>
+    <label>
+      <input type="checkbox" name="active" checked="{{ .Data.Post.Active }}" />
+      Активный
+    </label>
 
-        <button type="submit" >Отправить</button>
-    </fieldset>
+    <button type="submit">Отправить</button>
+  </fieldset>
 </form>
+{{ end }}
 
+{{ define "scripts" }}
+<script src="https://unpkg.com/pell"></script>
+<script defer>
+  var postTextInput = document.getElementById("post-text");
+
+  var editor = pell.init({
+    // <HTMLElement>, required
+    element: document.getElementById("pell-editor"),
+    onChange: (html) => {
+      postTextInput.value = html;
+    },
+
+    // <string>, optional, default = 'div'
+    // Instructs the editor which element to inject via the return key
+    defaultParagraphSeparator: "p",
+
+    // <boolean>, optional, default = false
+    // Outputs <span style="font-weight: bold;"></span> instead of <b></b>
+    styleWithCSS: false,
+
+    // <Array[string | Object]>, string if overwriting, object if customizing/creating
+    // action.name<string> (only required if overwriting)
+    // action.icon<string> (optional if overwriting, required if custom action)
+    // action.title<string> (optional)
+    // action.result<Function> (required)
+    // Specify the actions you specifically want (in order)
+    actions: [
+      "bold",
+      "italic",
+      "underline",
+      "heading1",
+      "heading2",
+      "paragraph",
+      "quote",
+      "olist",
+      "ulist",
+      "code",
+      "line",
+      "link",
+      "image"
+    ],
+
+    // classes<Array[string]> (optional)
+    // Choose your custom class names
+    classes: {
+      actionbar: "pell-actionbar",
+      button: "pell-button",
+      content: "pell-content",
+      selected: "pell-button-selected",
+    },
+  });
+  editor.content.innerHTML = postTextInput.value;
+</script>
 {{ end }}
