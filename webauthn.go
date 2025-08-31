@@ -32,7 +32,7 @@ func (u *User) WebAuthnCredentials() []webauthn.Credential {
 	return u.Credentials
 }
 
-func (u *User) CredentialExcludeLIst() []protocol.CredentialDescriptor {
+func (u *User) CredentialExcludeList() []protocol.CredentialDescriptor {
 	credExcludeList := []protocol.CredentialDescriptor{}
 	for _, cred := range u.Credentials {
 		descriptor := protocol.CredentialDescriptor{
@@ -79,7 +79,7 @@ func beginRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	options, session, err := webAuthn.BeginRegistration(
 		user,
 		webauthn.WithAuthenticatorSelection(authSelect),
-		webauthn.WithExclusions(user.CredentialExcludeLIst()),
+		webauthn.WithExclusions(user.CredentialExcludeList()),
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -131,7 +131,7 @@ func beginLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	options, session, err := webAuthn.BeginLogin(
 		user,
-		webauthn.WithAllowedCredentials(user.CredentialExcludeLIst()),
+		webauthn.WithAllowedCredentials(user.CredentialExcludeList()),
 		webauthn.WithAssertionPublicKeyCredentialHints([]protocol.PublicKeyCredentialHints{"security-key"}),
 		webauthn.WithUserVerification(protocol.UserVerificationRequirement("discouraged")),
 	)

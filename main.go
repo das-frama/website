@@ -69,6 +69,19 @@ var jobs = []string{
 
 var secret string
 
+func init() {
+	flag.Parse()
+	if *port == 0 {
+		log.Fatalln("Порт не может быть нулевым")
+	}
+	if *data == "" {
+		log.Fatalln("Каталог с данными не может быть пустым")
+	}
+	if *rpid == "" {
+		log.Fatalln("Разделительный символ для портов не может быть пустым")
+	}
+}
+
 func main() {
 	// Пытаемся дешифровать файл с мастер-паролем.
 	var err error
@@ -77,7 +90,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	flag.Parse()
+	// Покажем какой rpid
+	fmt.Println("RPID:", *rpid)
 
 	// Инициализация БД.
 	if err := initDB(fmt.Sprintf("%s/database.db", *data)); err != nil {
