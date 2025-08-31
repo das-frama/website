@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"time"
@@ -18,7 +19,13 @@ import (
 var schemaSQL string
 var db *sql.DB
 
+type Model struct {
+	Saved bool
+	Deleted bool
+}
+
 type Device struct {
+	Model
 	ID        int       `db:"id"`
 	DeviceID  string    `db:"device_id"`
 	Active    bool      `db:"active"`
@@ -26,6 +33,7 @@ type Device struct {
 }
 
 type User struct {
+	Model
 	ID          int
 	Name        string
 	Credentials []webauthn.Credential
@@ -34,6 +42,7 @@ type User struct {
 }
 
 type Session struct {
+	Model
 	ID        int
 	UserID    int
 	Token     string
@@ -42,10 +51,11 @@ type Session struct {
 }
 
 type Post struct {
+	Model
 	ID        int
 	Title     string
 	Slug      string
-	Text      string
+	Text      template.HTML
 	Active    bool
 	CreatedAt time.Time
 }
@@ -66,8 +76,10 @@ func initDB(path string) error {
 		if _, err := db.Exec(schemaSQL); err != nil {
 			return fmt.Errorf("cannot init schema: %v", err)
 		}
-		// Create superuser.
-		su := &User{Name: "Tannhäuser"}
+	}
+	// Create superuser if empty.
+	if !hasSuperuser(context.Background()) {
+		su := &User{Name: "Tannhäuser", ID: 1}
 		if err := saveUser(context.Background(), su); err != nil {
 			return fmt.Errorf("cannot create superuser: %v", err)
 		}
@@ -75,6 +87,15 @@ func initDB(path string) error {
 	}
 
 	return nil
+}
+
+func hasSuperuser(ctx context.Context) bool {
+	var count int
+	err := db.QueryRowContext(ctx, "SELECT COUNT(*) FROM superusers WHERE id = ?", 1).Scan(&count)
+	if err != nil {
+		return false
+	}
+	return count > 0
 }
 
 func getUserById(ctx context.Context, id int) (*User, error) {
@@ -94,20 +115,23 @@ func getUserById(ctx context.Context, id int) (*User, error) {
 		}
 	}
 
+	user.Saved = true
+
 	return user, nil
 }
 
 func saveUser(ctx context.Context, user *User) error {
 	creds, _ := json.Marshal(user.Credentials)
-	if user.ID == 0 {
+	if !user.Saved {
 		// Create.
-		res, err := db.ExecContext(ctx, "INSERT INTO superusers (name, credentials, verified) VALUES (?, ?, ?)",
-			user.Name, string(creds), user.Verified)
+		res, err := db.ExecContext(ctx, "INSERT INTO superusers (id, name, credentials, verified) VALUES (?, ?, ?, ?)",
+			user.ID, user.Name, string(creds), user.Verified)
 		if err != nil {
 			return err
 		}
 		id, _ := res.LastInsertId()
 		user.ID = int(id)
+		user.Saved = true
 		user.CreatedAt = time.Now()
 		return nil
 	}
@@ -127,11 +151,12 @@ func getSessionByToken(ctx context.Context, token string) (*Session, error) {
 		return nil, err
 	}
 
+	session.Saved = true
 	return session, nil
 }
 
 func saveSession(ctx context.Context, session *Session) error {
-	if session.ID == 0 {
+	if !session.Saved {
 		// Create.
 		res, err := db.ExecContext(ctx, "INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)",
 			session.UserID, session.Token, session.ExpiresAt)
@@ -141,6 +166,7 @@ func saveSession(ctx context.Context, session *Session) error {
 		id, _ := res.LastInsertId()
 		session.ID = int(id)
 		session.CreatedAt = time.Now()
+		session.Saved = true
 		return nil
 	}
 
@@ -154,21 +180,36 @@ func saveSession(ctx context.Context, session *Session) error {
 // getPostById retrieves a post by its ID from the database.
 func getPostById(ctx context.Context, id int) (Post, error) {
 	var post Post
-	err := db.QueryRowContext(ctx, "SELECT id, slug, title, text, active FROM posts WHERE id = ?", id).
-		Scan(&post.ID, &post.Slug, &post.Title, &post.Text, &post.Active)
+	err := db.QueryRowContext(ctx, "SELECT id, slug, title, text, active, created_at FROM posts WHERE id = ?", id).
+		Scan(&post.ID, &post.Slug, &post.Title, &post.Text, &post.Active, &post.CreatedAt)
 	if err != nil {
 		return post, err
 	}
 
-	return post, nil
+	post.Saved = true
 
+	return post, nil
+}
+
+// getPostBySlug retrieves a post by its Slug from the database.
+func getPostBySlug(ctx context.Context, slug string) (Post, error) {
+	var post Post
+	err := db.QueryRowContext(ctx, "SELECT id, slug, title, text, active, created_at FROM posts WHERE slug = ?", slug).
+		Scan(&post.ID, &post.Slug, &post.Title, &post.Text, &post.Active, &post.CreatedAt)
+	if err != nil {
+		return post, err
+	}
+
+	post.Saved = true
+
+	return post, nil
 }
 
 // listPosts lists all posts from the database.
 func listPosts(ctx context.Context) ([]Post, error) {
 	rows, err := db.QueryContext(ctx, "SELECT id, slug, title, text, active, created_at FROM posts ORDER BY created_at DESC")
 	if err != nil {
-		return nil, fmt.Errorf("Error while fecthing posts: %v", err);
+		return nil, fmt.Errorf("Error while fecthing posts: %v", err)
 	}
 	defer rows.Close()
 
@@ -178,6 +219,7 @@ func listPosts(ctx context.Context) ([]Post, error) {
 		if err := rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Text, &p.Active, &p.CreatedAt); err != nil {
 			return nil, fmt.Errorf("Error while scaning post: %v", err)
 		}
+		p.Saved = true
 		posts = append(posts, p)
 	}
 	if err := rows.Err(); err != nil {
@@ -189,7 +231,7 @@ func listPosts(ctx context.Context) ([]Post, error) {
 
 // savePost saves a post to the database.
 func savePost(ctx context.Context, post *Post) error {
-	if post.ID == 0 {
+	if !post.Saved {
 		// Create.
 		res, err := db.ExecContext(ctx, "INSERT INTO posts (title, slug, text, active) VALUES (?, ?, ?, ?)",
 			post.Title, post.Slug, post.Text, post.Active)
@@ -199,6 +241,7 @@ func savePost(ctx context.Context, post *Post) error {
 		id, _ := res.LastInsertId()
 		post.ID = int(id)
 		post.CreatedAt = time.Now()
+		post.Saved = true
 		return nil
 	}
 
@@ -216,5 +259,7 @@ func deletePost(ctx context.Context, post *Post) error {
 	}
 
 	_, err := db.ExecContext(ctx, "DELETE FROM posts WHERE id = ?", post.ID)
+
+	post.Deleted = true
 	return err
 }

@@ -173,7 +173,7 @@ func finishLoginHandler(w http.ResponseWriter, r *http.Request) {
 	session := &Session{
 		Token:     generateRandomString(),
 		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(time.Hour * 24),
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 30),
 	}
 	if err := saveSession(r.Context(), session); err != nil {
 		http.Error(w, fmt.Sprintf("Ошибка создания сессии: %s", err.Error()), http.StatusInternalServerError)

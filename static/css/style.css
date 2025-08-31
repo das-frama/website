@@ -153,7 +153,8 @@ body {
 }
 
 h1 {
-  margin: 1rem 0;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 h2 {
   font-size: 2rem;
@@ -212,7 +213,7 @@ nav h1 {
 }
 
 footer {
-  margin-top: 2rem;
+  margin-top: 5rem;
 }
 
 footer nav {
@@ -383,4 +384,8 @@ blockquote {
 }
 .underline:hover {
   text-decoration: none;
+}
+
+.post-content {
+  margin-top: 1rem;
 }

@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"slices"
 	"time"
 )
 
@@ -68,7 +67,6 @@ var jobs = []string{
 	"работаю швеёй в ИК-14. Делаем носки, футболки-маечки, хлопчатые трусы и роскошные шарфы.",
 }
 
-var posts = []Post{}
 var secret string
 
 func main() {
@@ -93,12 +91,7 @@ func main() {
 		for _, t := range page.Templates {
 			tt = append(tt, fmt.Sprintf("templates/%s", t))
 		}
-		tmpl := template.Must(template.ParseFS(templateFS, tt...)).Funcs(template.FuncMap{
-			"toMoscow": func(t time.Time) time.Time {
-				loc, _ := time.LoadLocation("Europe/Moscow")
-				return t.In(loc)
-			},
-		})
+		tmpl := template.Must(template.ParseFS(templateFS, tt...))
 
 		http.HandleFunc(page.Path, func(name string, page Page) http.HandlerFunc {
 			return func(w http.ResponseWriter, r *http.Request) {
@@ -148,9 +141,11 @@ func handleIndex(r *http.Request) map[string]any {
 }
 
 func handleBlog(r *http.Request) map[string]any {
-	slices.SortFunc(posts, func(a Post, b Post) int {
-		return b.CreatedAt.Compare(a.CreatedAt)
-	})
+	posts, err := listPosts(r.Context())
+	if err != nil {
+		return nil
+	}
+
 	return map[string]any{
 		"Posts": posts,
 	}
@@ -158,15 +153,17 @@ func handleBlog(r *http.Request) map[string]any {
 
 func handleBlogDetail(r *http.Request) map[string]any {
 	slug := r.PathValue("slug")
-	i := slices.IndexFunc(posts, func(p Post) bool {
-		return p.Slug == slug
-	})
-	if i == -1 {
+	post, err := getPostBySlug(r.Context(), slug)
+	if err != nil {
+		log.Printf("Error getting post by slug: %v", err)
+		return nil
+	}
+	if !post.Active {
 		return nil
 	}
 
 	return map[string]any{
-		"Post": posts[i],
+		"Post": post,
 	}
 }
 

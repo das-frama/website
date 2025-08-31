@@ -1,12 +1,11 @@
 {{ define "content" }} {{ $post := .Data.Post }}
 
+<a href="/blog">&leftarrow; Назад</a>
 <article>
-    <h1>{{ $post.Title }}</h1>
-    <div>
-        <time datetime="{{ $post.CreatedAt }}"
-            >Опубликовано: {{ $post.CreatedAt.Format "02.01.2006" }}</time
-        >
-    </div>
+  <h1>{{ $post.Title }}</h1>
+  <time datetime="{{ $post.CreatedAt }}">от {{ $post.CreatedAt.Format "02 Jan 2006" }}</time>
+
+  <div class="post-content">{{ $post.Text }}</div>
 </article>
 
 {{ end }}
